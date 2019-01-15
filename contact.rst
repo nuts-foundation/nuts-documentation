@@ -11,4 +11,4 @@ More information about the Nuts foundation can be found at `nuts.nl <https://nut
 *************
 Communication
 *************
-The main means of communication is via `Slack <nuts-foundation.slack.com>`_.
+The main means of communication is via `Slack <https://nuts-foundation.slack.com>`_.
