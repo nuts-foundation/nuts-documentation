@@ -11,3 +11,5 @@ Index
     :numbered:
     :titlesonly:
     :glob:
+
+    *
