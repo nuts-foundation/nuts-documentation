@@ -2,6 +2,13 @@
 Contact
 #######
 
-Currently you can contact members of the Nuts foundation via `nuts.nl <https://nuts.nl>`_
+***********
+Information
+***********
 
+More information about the Nuts foundation can be found at `nuts.nl <https://nuts.nl>`_
+
+*************
+Communication
+*************
 The main means of communication is via `Slack <nuts-foundation.slack.com>`_.
