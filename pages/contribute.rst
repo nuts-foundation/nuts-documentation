@@ -9,3 +9,8 @@ Documentation contributions
 ***************************
 
 Documentation is written in Restructured Text. A CheatSheet can be found `here <https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_.
+
+You can test your documentation by installing the required components.
+
+.. include:: ../README.rst
+    :start-after: .. inclusion-marker-for-contribution
