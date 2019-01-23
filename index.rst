@@ -7,4 +7,4 @@ Nuts developer documentation
     :caption: Contents:
     :glob:
 
-    *
+    pages/*
