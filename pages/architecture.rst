@@ -1,0 +1,224 @@
+#######################
+High level architecture
+#######################
+
+The image below is a first attempt to identify all the required components for making Nuts work. The three different
+*spaces* are explained in the equally named chapters. All interfaces between components will have a specification.
+Each vendor has the choice to follow this reference implementation or just use the individual components
+(mix-and-match).
+
+.. figure:: /_static/images/high_level_architecture.png
+    :width: 600px
+    :align: center
+    :alt: high level architecture
+    :figclass: align-center
+
+    Nuts components
+
+************
+Vendor space
+************
+
+*Vendor space* contains all the components that **must** be implemented by each vendor with exception of the PGO UI.
+Most of the components will already be available since they are part of the EHR. Each of the components will be
+explained further in the following sections.
+
+API
+===
+
+The *API* is the primary point of data exchange for a care provider. It'll be based on international standards, for
+example: FHIR or CDA. This component is placed in vendor space because the underlying TLS connection will be secured
+with two-way SSL. The control over the certificates should lie with the entity responsible for the data: the
+care provider. Ultimately, it'll be the software vendor who will probably offer this responsibility as a service.
+
+The *API* will most likely consist of multiple components in an average production environment. The main responsibilities
+are:
+
+* Authentication
+* Consent authorisation
+* Auditing
+* Return data in requested format
+
+Authentication
+--------------
+
+Authentication within Nuts will be provided by an Irma signature. The signature will have a signature text and attached
+attributes used to sign the text. Within the signature text, the requesting application name, the requesting care
+provider, the goal binding and a timestamp must be included. The attributes used to sign the text will identify the
+user. The requesting application name will also be in the CN used in the two-way TLS connection, this ensures that the
+care provider/vendor receiving the request can not use the same signature to request the Nuts network
+(man-in-the-middle). The timestamp ensures a short lived session. All the other information will be used to lookup the
+required consent record.
+
+Consent authorisation
+---------------------
+
+The consent check is basically the authorization check for the request. Every consent record basically consists of a
+triple: (care provider, patient, care professional), or 'May the care professional access the data for the patient
+managed by the care provider?' The patient can be acquired by analysing the request, for example within FHIR the BSN
+will be included in the request, the care professional can be determined by the attributes used to generate the
+signature. The query to the consent registry within Nuts will then result in a list of care providers which can be used
+to query the correct data (or not found).
+
+Data
+----
+
+If all previous steps have succeeded, the API component can then proceed to fetch and convert the data as requested. The
+initial versions will probably use FHIR as standard of choice.
+
+Patients DB
+===========
+
+This *database* represents the patient's personal information and specifically the BSN record. All EHRs will contain this
+information since it's required by law. The data needs to be accessible by the *patient callback* component.
+
+Patient callback
+================
+
+This component will mainly be used to check if a patient is receiving care for the given care provider. If, for example,
+this care provider receives consent to access certain patient records from another care provider it can only accept this
+consent is the patient is really a patient there. If not, the BSN may not be stored and the consent request can not be
+accepted. This check can also be used to detect faulty or corrupt Nuts nodes, since a lot of negative results from this
+component may indicate fraud. In a later version of Nuts this can be used for automatic blacklisting of Nuts nodes.
+
+EHR UI
+======
+
+The EHR UI represents the piece of software the user interacts with. The part that is particular interesting is the
+consent UI. In the early stages of Nuts, the care providers will probably do all the work for gathering the patient
+consent. This means that the EHR needs to have a UI capable of recording this consent.
+
+PGO UI
+======
+
+This component represents the UI needed for the PGO-inclusion flow. An idea exists where a patient is redirected by a
+PGO to this component to link their PGO identity to a BSN. The vendor can then use the Nuts network to update the
+consent records with the added PGO identity for all existing consent records for that patient. The UI needs to be in
+vendor or service space, otherwise the BSN can not be used. The difference between putting it in vendor or service space
+would be if it's embedded or not. Nuts will provide a reference implemention for placing it in the *service space*.
+
+*************
+Service space
+*************
+
+*Service space* is a bit of a difficult concept to explain. The choice to implement/host this by the vendor is based on
+different considerations as opposed to implementing *Nuts space*. A vendor can choose to buy the needed Nuts services
+from a service provider. The biggest difference between *service space* and *Nuts space* is that *service space* contains
+**decrypted** data and *Nuts space* only contains **encrypted** data. (Care professional data is available unencrypted
+within the Nuts registry but that data is already made public by other sources). The *service space* also contains
+different private/public key-pairs. The level of trust for *service space* is much higher from the point of
+view of the care provider. Besides data encryption, the components in both spaces have different scalability
+requirements and require a different expertise to maintain.
+
+In the paragraph above, the notion of a service providers is introduced. This is a concept which allows smaller vendors
+to connect to Nuts and at the same time provide an opportunity for the current network providers to develop new
+business.
+
+The different components within *service space* are explained in the following sections.
+
+Nuts service api proxy
+======================
+
+This is mainly an abstraction component for now, to provide a single endpoint for *vendor space* to communicate with.
+It'll also contain some basic logic in the beginning. For example if it receives an event from the *Nuts api Proxy*
+signalling a new consent record has been added, it'll decrypt the record with the correct key and place it in the cache.
+
+It connects to the *Irma* server for checking Irma proofs if those are used to sign a consent record. This can't be done
+in Nuts space since it will then be encrypted.
+
+Consent cache
+=============
+
+All consent within *Nuts space* is encrypted. The cache will have a unencrypted copy of the records in memory to support
+querying from, for example, the *API*. The attached *encrypted storage* will ensure that this sensitive data is
+encrypted-at-rest.
+
+Crypto
+======
+
+The crypto component is an abstraction layer for the encryption/decryption process and the storage for pub/priv
+key-pairs. The abstraction is needed to support the different use-cases. A PGO might choose for file-storage since it'll
+only have a single key-pair. A service provider might choose for a Vault installation because it handles thousands of
+keys.
+
+Irma
+====
+
+Generic Irma server for checking Irma proofs.
+
+**********
+Nuts space
+**********
+
+The *Nuts space* consists of two main components: *Consent Cordapp* and the *Nuts registry*. The other components are
+requirements coming from technology choices for these two components. The funky figure within these components indicate
+that they use distributed technology. They basically are a data store without a single owner and the single truth is
+constructed from mutual approved contracts.
+
+Nuts registry
+=============
+
+The registry contains mostly relational and identifying information. It must be able to answer questions like:
+
+* What is the FHIR endpoint for this care provider?
+* Which Nuts nodes do we need to connect to?
+* Which Nuts nodes serve a particular Care Provider?
+* To which care provider does this care professional belong to?
+* and others
+
+The consensus about the data is constructed by a few different rules:
+
+* It'll probably contain a tree structure, where a lower level node can only be **added** by a higher level node.
+* Only the **owner** of a piece of data can update that data.
+
+Which can be translated to things like:
+
+* Only a Nuts node can add a care provider/application/service to a that Nuts Node.
+* A care professional can only be added to a care provider by the care provider.
+* The personal data of a care professional can only be updated by that care professional.
+
+To guarantee these constraints, cryptographic rules have to be used. Nuts will probably use a combination of
+Irma signatures and digital signatures (PGP) for this.
+
+Since the data within the registry is useful for everybody using Nuts, it can use a mesh network to keep in sync.
+
+Registry UI
+===========
+
+There'll probably be two UI's: one for administrative purposes and one for care professionals to update their
+information. The last will then probably be a reference implementation provided by Nuts, since vendors can offer such an
+interface from within their own products.
+
+Doorman
+=======
+
+*Doorman* is a Corda concept. It translates Nuts endpoint information to the required Corda format. It'll use data from
+the registry to automatically detect new Nuts nodes.
+
+Consent Cordapp
+===============
+
+The Corda node which will store all the consent records. Corda has currently been chosen to store the consent. It's
+unique ability to only include nodes that are part of the consent in the transaction makes it ideal to synchronize
+personal information. Although the data itself is encrypted, having it all over the place just isn't a good idea.
+Another plus is that it requires a third party to also acknowledge the transaction (the notary). It can even use a
+voting scheme to include multiple random notaries. This means that the control over all transactions lies with the
+community and not a single party.
+
+For every transaction, each involved node needs to approve the transaction according to the logic in the contract. This
+will rely on data available in the *Nuts registry* or even the *patient callback*, proxied through *service space* for
+decryption. This will prevent data to scatter all over the place.
+
+The model of the consent record will probably be inspired on the consent FHIR model and future legislation.
+
+Consent bridge
+==============
+
+The bridge is an abstraction layer for translating the Java specific format from the *Consent Cordapp* to something more
+usefull for different vendors. This will allow different vendors to be able to use their own technology stack.
+
+Nuts api proxy
+==============
+
+Place holder for single abstract point. The future will proof if this component is needed.
+
