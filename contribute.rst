@@ -11,11 +11,16 @@ Documentation contributions
 Documentation is written in Restructured Text. A CheatSheet can be found `here <https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html>`_.
 
 You can test your documentation by installing the required components. You first have to install python, check `<https://www.python.org/>`_ on how to install python for your OS.
-Next you have to install the following components using **pip**::
+Next you have to install `pip <https://pip.pypa.io/en/stable/installing/>`_.
+Then install the following components using **pip**::
 
     pip install sphinx --user
     pip install recommonmark
     pip install sphinx_rtd_theme
+
+For MacOS make sure the sphinx executables are added to your PATH::
+
+    export PATH=$HOME/Library/Python/2.7/bin:$PATH
 
 Then you can generate the documentation locally with::
 
