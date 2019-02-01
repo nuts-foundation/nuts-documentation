@@ -12,7 +12,7 @@ The image below is a first attempt to identify all the required components for m
 
     Nuts components
 
-At first glance, the different components are divided into three different *spaces*. This is done to distinguish between different levels of trust and (probably) different non-functional requirements like scaling. *Vendor space* has the highest level of trust. It includes both personal and medical data. Any components required to make Nuts work **must** be implemented by the vendor. *Service space* is also a trusted space since it'll include decrypted personal data, but not medical data. Since it consists of quite a few components a vendor can buy this as part of a service package from a different vendor. For example, a simple PGO might want get a subscription to a SaaS service which includes both *Service space* and *Nuts space* which only requires the PGO to implement the *Patient callback*. *Service space* also handles the administration of all the certificate logic for TLS connections. *Nuts space* only contains encrypted personal data and decrypted personal data that has already been made public. The primary goal of *Nuts space* is to make sure all required data for running the Nuts network is distributed across all nodes without any centrally controlled component. This notion of different service levels allows smaller vendors to connect to Nuts and at the same time provide an opportunity for the current network providers to develop new business.
+At first glance, the different components are divided into four different *spaces*. This is done to distinguish between different levels of trust and (probably) different non-functional requirements like scaling. *Vendor space* has the highest level of trust. It includes both personal and medical data. Any components required to make Nuts work **must** be implemented by the vendor. *Service space* is also a trusted space since it'll include decrypted personal data, but not medical data. Since it consists of quite a few components a vendor can buy this as part of a service package from a different vendor. For example, a simple PGO might want get a subscription to a SaaS service which includes both *Service space* and *Nuts space* which only requires the PGO to implement the *Patient callback*. *Service space* also handles the administration of all the certificate logic for TLS connections. *Nuts space* only contains encrypted personal data and decrypted personal data that has already been made public. The primary goal of *Nuts space* is to make sure all required data for running the Nuts network is distributed across all nodes without any centrally controlled component. This notion of different service levels allows smaller vendors to connect to Nuts and at the same time provide an opportunity for the current network providers to develop new business. *Nuts foundation* is a separate entity which has the responsibility for adding the nodes. Essentially it controls the network. Although we don't like centrally controlled components, with the current state of technology, a central authority or root is required. In this case the *Nuts foundation* will control the root certificate.
 
 ************
 Vendor space
@@ -105,7 +105,6 @@ Nuts registry
 The registry contains mostly relational and identifying information. It must be able to answer questions like:
 
 * What is the FHIR endpoint for this care provider?
-* Which Nuts nodes do we need to connect to?
 * Which Nuts nodes serve a particular Care Provider?
 * To which care provider does this care professional belong to?
 * and others
@@ -130,11 +129,6 @@ Registry UI
 
 There'll probably be two UI's: one for administrative purposes and one for care professionals to update their information. The last will then probably be a reference implementation provided by Nuts, since vendors can offer such an interface from within their own products.
 
-Doorman
-=======
-
-*Doorman* is a Corda concept. It translates Nuts endpoint information to the required Corda format. It'll use data from the registry to automatically detect new Nuts nodes.
-
 Consent Cordapp
 ===============
 
@@ -150,7 +144,22 @@ Consent bridge
 The bridge is an abstraction layer for translating the Java specific format from the *Consent Cordapp* to something more usefull for different vendors. This will allow different vendors to be able to use their own technology stack.
 
 Nuts node API proxy
-==============
+===================
 
 Place holder for single abstract point. The future will proof if this component is needed.
+
+***************
+Nuts foundation
+***************
+
+The *Nuts foundation* controls the root certificate, defines which nodes are added to the network and which versions of the Cordapp are allowed. This is needed because Corda requires a CA tree structure. Corda also requires a NetworkMap which must be signed by a single key. The control of this key must lie with a trusted third party. This party can only accept/reject Nuts nodes, it cannot exchange medical or personal data.
+
+Nuts registry
+=============
+The *Nuts foundation* will also run a *Nuts registry* instance to add the Nuts nodes so they can be found by other nodes. The Nuts nodes can then add new organisations themselves.
+
+Nuts Consent Discovery
+======================
+The Corda service that will expose the NetworkMap and network parameters to all Nuts nodes. Each node will cache this data so the discovery service only needs to be up for adding new nodes. This means that the foundation will get an active role in keeping root keys secure and for Nuts nodes.
+
 
