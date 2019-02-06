@@ -12,15 +12,16 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath('.'))
 
 
 # -- Project information -----------------------------------------------------
 
 project = u'Nuts'
-copyright = u'2019, Stichting Nuts'
+copyright = u'2019, Nuts community'
 author = u'Nuts community'
 
 # The short X.Y version
@@ -28,6 +29,13 @@ version = u''
 # The full version, including alpha/beta/rc tags
 release = u''
 
+# -- RTD configuration ------------------------------------------------
+
+# on_rtd is whether we are on readthedocs.org, this line of code grabbed from docs.readthedocs.org
+on_rtd = os.environ.get("READTHEDOCS", None) == "True"
+
+# This is used for linking and such so we link to the thing we're building
+rtd_version = os.environ.get("READTHEDOCS_VERSION", "latest")
 
 # -- General configuration ---------------------------------------------------
 
@@ -40,6 +48,7 @@ release = u''
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -76,6 +85,10 @@ exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
 pygments_style = None
 
 
+intersphinx_mapping = {
+    "nuts-discovery": ("https://nuts-discovery.readthedocs.io/en/%s/" % rtd_version, None),
+}
+
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -104,6 +117,7 @@ html_static_path = ['_static']
 # 'searchbox.html']``.
 #
 # html_sidebars = {}
+html_sidebars = { '**': ['globaltoc.html', 'relations.html', 'sourcelink.html', 'searchbox.html'] }
 
 
 # -- Options for HTMLHelp output ---------------------------------------------
@@ -137,7 +151,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Nuts.tex', u'Nuts Documentation',
-     u'Stichting Nuts', 'manual'),
+     u'Nuts community', 'manual'),
 ]
 
 
