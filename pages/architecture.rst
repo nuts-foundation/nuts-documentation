@@ -21,7 +21,7 @@ Vendor space
 *Vendor space* contains all the components that **must** be implemented by each vendor with exception of the PGO UI. Most of the components will already be available since they are part of the EHR. Each of the components will be explained further in the following sections.
 
 Public EHR API
-===
+==============
 
 The *Public EHR API* is the primary point of data exchange for a care provider. It'll be based on international standards, for example: FHIR or CDA. This component is placed in vendor space because the underlying TLS connection will be secured with two-way SSL. The control over the certificates should lie with the entity responsible for the data: the care provider. Ultimately, it'll be the software vendor who will probably offer this responsibility as a service.
 
