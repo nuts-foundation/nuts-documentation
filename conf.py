@@ -137,7 +137,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'Nuts.tex', u'Nuts Documentation',
-     u'Stichting Nuts', 'manual'),
+     u'Nuts community', 'manual'),
 ]
 
 

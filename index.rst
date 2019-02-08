@@ -8,3 +8,4 @@ Nuts developer documentation
     :glob:
 
     pages/*
+    Discovery </projects/nuts-discovery/en/latest#://>
