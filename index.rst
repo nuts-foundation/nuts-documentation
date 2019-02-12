@@ -10,5 +10,3 @@ Nuts developer documentation
     :glob:
 
     pages/*
-
-:ref:`nuts-discovery`
