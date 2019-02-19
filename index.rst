@@ -1,3 +1,5 @@
+.. _nuts-documentation:
+
 ############################
 Nuts developer documentation
 ############################
@@ -8,4 +10,3 @@ Nuts developer documentation
     :glob:
 
     pages/*
-    Discovery </projects/nuts-discovery/en/latest#://>
