@@ -2,7 +2,8 @@
 Login Contracts
 #######################
 
-In the Nuts network, the identity of a user is universally valid. This means the whole network trusts authorities like the BIG, CIBG and BRP instead of the unknown sysadmin and processes of a random care organisation.
+In the Nuts network, the identity of a user is universally valid.
+This means the whole network trusts authorities like the BIG, CIBG and BRP instead of the unknown sysadmin and processes of a random care organisation.
 
 When a user wants to access data stored in a different EHR system than they are currently using, they must give their own system consent to request data.
 
@@ -96,20 +97,21 @@ We can encode our *Purpose* field based on the FHIR consent scope set: https://w
 Signing with attributes
 =======================
 
-Nuts is made for many different user groups: GPs, patients, guardians, informal care givers etc. All these people have
-different relevant properties (attributes). Therefor we need an universal authentication system which can handle many different
+Nuts is made for many different user groups: GPs, patients, guardians, informal care givers etc.
+All these people have different relevant properties (attributes).
+Therefor we need an universal authentication system which can handle many different
 attributes.
 https://privacypatterns.org/patterns/attribute-based-credentials
 
 Attribute Based Credentials (ABC)
 ---------------------------------
 
-In order to sign a contract we need an application which support these attributes. Currently in the Netherlands there
-is one system which gains in popularity: IRMA (I reveal my attributes) from the privacy by design foundation: https://privacybydesign.foundation/.
+In order to sign a contract we need an application which support these attributes.
+Currently in the Netherlands there is one system which gains in popularity: IRMA (I reveal my attributes) from the privacy by design foundation: https://privacybydesign.foundation/.
 
 
-Using ABC decouples the issuer from the verifier. This improves the privacy of the user, eliminates the need for 1-to-1 API implementations
-and the need for complicated legal documents between the parties since the users decides what they will do with their own data.
+Using ABC decouples the issuer from the verifier.
+This improves the privacy of the user, eliminates the need for 1-to-1 API implementations and the need for complicated legal documents between the parties since the users decides what they will do with their own data.
 
 .. Note::
   It is important to note that the workings of Nuts are not limited to IRMA.
