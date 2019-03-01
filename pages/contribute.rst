@@ -14,3 +14,15 @@ You can test your documentation by installing the required components.
 
 .. include:: ../README.rst
     :start-after: .. inclusion-marker-for-contribution
+
+****************************
+Documentation initialisation
+****************************
+
+When starting a new project, the documentation can be initialised using::
+
+    sphinx-quickstart docs
+
+This will start the interactive setup of sphinx with a document root at *docs*. For Nuts projects we use that specific directory for documentation in a code project. You might have noticed that the *nuts-documentation* repo uses the root directory as documentation root.
+
+Most defaults will do, although we use intersphinx to go back-and-forth between the different sub-projects.
