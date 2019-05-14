@@ -88,6 +88,7 @@ pygments_style = None
 intersphinx_mapping = {
     "nuts-discovery": ("https://nuts-discovery.readthedocs.io/en/%s/" % rtd_version, None),
     "nuts-consent-cordapp": ("https://nuts-consent-cordapp.readthedocs.io/en/%s/" % rtd_version, None),
+    "nuts-crypto": ("https://nuts-crypto.readthedocs.io/en/%s/" % rtd_version, None),
 }
 
 # -- Options for HTML output -------------------------------------------------
