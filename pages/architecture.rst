@@ -14,6 +14,8 @@ The image below is a first attempt to identify all the required components for m
 
 At first glance, the different components are divided into four different *spaces*. This is done to distinguish between different levels of trust and (probably) different non-functional requirements like scaling. *Vendor space* has the highest level of trust. It includes both personal and medical data. Any components required to make Nuts work **must** be implemented by the vendor. *Service space* is also a trusted space since it'll include decrypted personal data, but not medical data. Since it consists of quite a few components a vendor can buy this as part of a service package from a different vendor. For example, a simple PGO might want get a subscription to a SaaS service which includes both *Service space* and *Nuts space* which only requires the PGO to implement the *Patient callback*. *Service space* also handles the administration of all the certificate logic for TLS connections. *Nuts space* only contains encrypted personal data and decrypted personal data that has already been made public. The primary goal of *Nuts space* is to make sure all required data for running the Nuts network is distributed across all nodes without any centrally controlled component. This notion of different service levels allows smaller vendors to connect to Nuts and at the same time provide an opportunity for the current network providers to develop new business. *Nuts foundation* is a separate entity which has the responsibility for adding the nodes. Essentially it controls the network. Although we don't like centrally controlled components, a central authority or root is required. In this case the *Nuts foundation* will control the root certificate. This is a direct result of the available technology, in the future other technology might become available or with enough Nuts participants, we can create something of our own.
 
+Communication between the different components is done via REST services and ZMQ. In the future different protocols might be supported. Different security measures are/will be supported between the different components.
+
 ************
 Vendor space
 ************
@@ -71,17 +73,17 @@ This component represents the UI needed for the PGO-inclusion flow. An idea exis
 Service space
 *************
 
-Nuts service api proxy
-======================
+Nuts auth
+=========
 
-This is mainly an abstraction component for now, to provide a single endpoint for *vendor space* to communicate with. It'll also contain some basic logic in the beginning. For example if it receives an event from the *Nuts node API proxy* signalling a new consent record has been added, it'll decrypt the record with the correct key and place it in the cache.
-
+This component is responsible for checking the different Irma signatures used like login and connect (PGO).
 It connects to the *Irma* server for checking Irma proofs if those are used to sign a consent record. This can't be done in Nuts space since it will then be encrypted.
 
 Consent cache
 =============
 
-All consent within *Nuts space* is encrypted. The cache will have a unencrypted copy of the records in memory to support querying from, for example, the *API*. The attached *encrypted storage* will ensure that this sensitive data is encrypted-at-rest.
+All consent within *Nuts space* is encrypted. The cache will have a unencrypted copy of the records in memory to support querying from, for example, the *API*.
+The attached *encrypted storage* will ensure that this sensitive data is encrypted-at-rest.
 
 Crypto
 ======
@@ -92,6 +94,11 @@ Irma
 ====
 
 Generic Irma server for checking Irma proofs.
+
+Consent validation
+==================
+
+This component handles all logic regarding validating the FHIR consent record. It checks the content via different rules predetermined by Nuts.
 
 **********
 Nuts space
@@ -143,10 +150,6 @@ Consent bridge
 
 The bridge is an abstraction layer for translating the Java specific format from the *Consent Cordapp* to something more usefull for different vendors. This will allow different vendors to be able to use their own technology stack.
 
-Nuts node API proxy
-===================
-
-Place holder for single abstract point. The future will proof if this component is needed.
 
 ***************
 Nuts foundation
