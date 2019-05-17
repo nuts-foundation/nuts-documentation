@@ -79,17 +79,27 @@ This component represents the UI needed for the PGO-inclusion flow. An idea exis
 Service space
 *************
 
-Nuts auth
-=========
-
-This component is responsible for checking the different Irma signatures used like login and connect (PGO).
-It connects to the *Irma* server for checking Irma proofs if those are used to sign a consent record. This can't be done in Nuts space since it will then be encrypted.
-
 Consent cache
 =============
 
 All consent within *Nuts space* is encrypted. The cache will have a unencrypted copy of the records in memory to support querying from, for example, the *API*.
 The attached *encrypted storage* will ensure that this sensitive data is encrypted-at-rest.
+
+Consent Logic
+=============
+
+The logical component does most of the heavy lifting and depends on all the other components in *service space*.
+For example, when creating a new consent request, this is send to the component it then checks if it's valid by using the validation component.
+Next it has to find the correct organizations and encrypt the record with the right public keys.
+Then it has to send the encrypted record to the Consent bridge for synchronization.
+
+Also when a new consent event is received by the component from the consent bridge, it needs to decrypt it and check its validity.
+If valid it has to be send to vendor space to check if the subject is really a patient for that care organization.
+
+Consent validation
+==================
+
+This component handles all logic regarding validating the FHIR consent record. It checks the content via different rules predetermined by Nuts.
 
 Crypto
 ======
@@ -101,10 +111,11 @@ Irma
 
 Generic Irma server for checking Irma proofs.
 
-Consent validation
-==================
+Nuts auth
+=========
 
-This component handles all logic regarding validating the FHIR consent record. It checks the content via different rules predetermined by Nuts.
+This component is responsible for checking the different Irma signatures used like login and connect (PGO).
+It connects to the *Irma* server for checking Irma proofs if those are used to sign a consent record. This can't be done in Nuts space since it will then be encrypted.
 
 **********
 Nuts space
