@@ -13,11 +13,6 @@ The complete Nuts identifiers thus consists of the URN followed by a colon and t
 
     urn:<NID>:<NSS>:<id>
 
-Example for BSN:
-..  code-block::
-
-    urn:oid:2.16.840.1.113883.2.4.6.3:999999990
-
 =====================================   ====================    =====================   ================================================================
 Identifier                              Known as                Used in                 Description
 =====================================   ====================    =====================   ================================================================
@@ -30,3 +25,30 @@ urn:ietf:rfc:1779                       X500Name                Registry        
 The choice (for now) has been made to use URN and OID style identifiers.
 URL style identifiers commonly used as namespaces seem to be all over the place and each new project or initiative declares its own namespace for the same identifier.
 We'd like the identifiers to be more static.
+
+Examples
+--------
+
+BSN
+...
+..  code-block::
+
+    urn:oid:2.16.840.1.113883.2.4.6.3:999999990
+
+AGBCode
+.......
+..  code-block::
+
+    urn:oid:2.16.840.1.113883.2.4.6.1:00000007
+
+X500Name
+........
+..  code-block::
+
+    urn:ietf:rfc:1779:O=Nuts, OU=Healthcare, C=NL, ST=Gelderland, L=Eibergen, CN=nuts_corda_development_local
+
+Endpoint
+........
+..  code-block::
+
+    urn:nuts:endpoint:consent
