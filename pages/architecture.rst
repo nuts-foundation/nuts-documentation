@@ -79,10 +79,10 @@ This component represents the UI needed for the PGO-inclusion flow. An idea exis
 Service space
 *************
 
-Consent cache
+Consent store
 =============
 
-All consent within *Nuts space* is encrypted. The cache will have a unencrypted copy of the records in memory to support querying from, for example, the *API*.
+All consent within *Nuts space* is encrypted. The store will have a unencrypted copy of the records in memory to support querying from, for example, the *API*.
 The attached *encrypted storage* will ensure that this sensitive data is encrypted-at-rest.
 
 Consent Logic
