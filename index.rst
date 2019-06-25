@@ -1,8 +1,8 @@
 .. _nuts-documentation:
 
-############################
-Nuts developer documentation
-############################
+##################
+Nuts documentation
+##################
 
 .. toctree::
     :maxdepth: 3
