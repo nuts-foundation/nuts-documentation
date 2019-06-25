@@ -14,6 +14,7 @@
 #
 import os
 import sys
+import subprocess
 
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -200,5 +201,18 @@ epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
 
+def source_read_handler(app, config):
+    branch = rtd_version
+
+    if rtd_version == "latest":
+        branch = "master"
+
+    branch = 'docv2'
+
+    ps = subprocess.Popen(('curl', "https://codeload.github.com/nuts-foundation/nuts-crypto/tar.gz/" + branch), stdout=subprocess.PIPE)
+    output = subprocess.check_output(("tar", "-xz", "--strip=2", "nuts-crypto-" + branch + "/docs/pages"), stdin=ps.stdout)
+    ps.wait()
+
 def setup(app):
+    app.connect('config-inited', source_read_handler)
     app.add_stylesheet('css/style.css')
