@@ -201,18 +201,24 @@ epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
 
-def source_read_handler(app, config):
+def download(repo, branch):
+    url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
+    ps_process = subprocess.Popen(['curl', url], stdout=subprocess.PIPE)
+    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE)
+    ps_process.stdout.close()  # Allow ps_process to receive a SIGPIPE if grep_process exits.
+    return grep_process.communicate()[0]
+
+def config_init_handler(app, config):
     branch = rtd_version
 
     if rtd_version == "latest":
         branch = "master"
 
-    branch = 'docv2'
-
-    ps = subprocess.Popen(('curl', "https://codeload.github.com/nuts-foundation/nuts-crypto/tar.gz/" + branch), stdout=subprocess.PIPE)
-    output = subprocess.check_output(("tar", "-xz", "--strip=2", "nuts-crypto-" + branch + "/docs/pages"), stdin=ps.stdout)
-    ps.wait()
+    output = download('nuts-crypto', 'unknown')
+    if str.find(str(output), 'tar: Unrecognized archive format'):
+        print("branch " + branch + " not found for nuts-crypto, switching to master")
+        download('nuts-crypto', 'master')
 
 def setup(app):
-    app.connect('config-inited', source_read_handler)
+    app.connect('config-inited', config_init_handler)
     app.add_stylesheet('css/style.css')
