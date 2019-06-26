@@ -101,13 +101,6 @@ intersphinx_mapping = {
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = ["_themes", ]
 
-html_context = {
-    "display_github": False, # Add 'Edit on Github' link instead of 'View page source'
-    "last_updated": True,
-    "commit": False,
-}
-html_show_sourcelink = False
-
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
