@@ -9,3 +9,5 @@ Building the documentation
   - ``pip3 install recommonmark``
   - ``pip3 install sphinx_rtd_theme``
   - ``pip3 install rst_include``
+  - ``pip3 install sphinx-jsonschema``
+  - ``pip3 install sphinxcontrib-httpdomain``
