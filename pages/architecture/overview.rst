@@ -7,7 +7,7 @@ High level architecture
 The image below is a first attempt to identify all the required components for making Nuts work. All interfaces between components will have a specification. Each vendor has the choice to implements their own components following the spec or just use the components provided by Nuts (mix-and-match).
 
 .. raw:: html
-    :file: /_static/images/high_level_architecture.svg
+    :file: ../../_static/images/high_level_architecture.svg
 
 At first glance, the different components are divided into four different *spaces*.
 This is done to distinguish between different levels of trust and (probably) different non-functional requirements like scaling.
