@@ -215,7 +215,7 @@ def config_init_handler(app, config):
     if rtd_version == "latest":
         branch = "master"
 
-    output = download('nuts-crypto', 'unknown')
+    output = download('nuts-crypto', branch)
     if str.find(str(output), 'tar: Unrecognized archive format'):
         print("branch " + branch + " not found for nuts-crypto, switching to master")
         download('nuts-crypto', 'master')
