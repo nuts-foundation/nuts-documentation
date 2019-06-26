@@ -205,8 +205,9 @@ def download(repo, branch):
     url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
     ps_process = subprocess.Popen(['curl', url], stdout=subprocess.PIPE)
     grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE)
-    ps_process.stdout.close()  # Allow ps_process to receive a SIGPIPE if grep_process exits.
+    ps_process.stdout.close()
     return grep_process.communicate()[0]
+
 
 def config_init_handler(app, config):
     branch = rtd_version
@@ -218,6 +219,7 @@ def config_init_handler(app, config):
     if str.find(str(output), 'tar: Unrecognized archive format'):
         print("branch " + branch + " not found for nuts-crypto, switching to master")
         download('nuts-crypto', 'master')
+
 
 def setup(app):
     app.connect('config-inited', config_init_handler)
