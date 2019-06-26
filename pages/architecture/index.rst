@@ -7,6 +7,7 @@ Architecture
     :hidden:
     :glob:
 
+    overview.rst
     *
 
 Some introduction to the general architecture
