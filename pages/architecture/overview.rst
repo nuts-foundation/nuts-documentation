@@ -1,3 +1,5 @@
+.. _nuts-documentation-architecure-overview:
+
 #######################
 High level architecture
 #######################
@@ -156,11 +158,12 @@ There'll probably be two UI's: one for administrative purposes and one for care 
 Consent Cordapp
 ===============
 
+The *Nuts Consent Cordapp* (What is a Cordapp?: https://docs.corda.net/cordapp-overview.html) is responsible for creating the decentralised state of consent.
+The :ref:`nuts-consent-cordapp-technical-model` therefore consists mainly of encrypted data. Validation of any data specific constraints will be delegated to *Service space* during a Corda transaction.
+
 The Corda node which will store all the consent records. Corda has currently been chosen to store the consent. It's unique ability to only include nodes that are part of the consent in the transaction makes it ideal to synchronize personal information. Although the data itself is encrypted, having it all over the place just isn't a good idea. Another plus is that it requires a third party to also acknowledge the transaction (the notary). It can even use a voting scheme to include multiple random notaries. This means that the control over all transactions lies with the community and not a single party.
 
 For every transaction, each involved node needs to approve the transaction according to the logic in the contract. This will rely on data available in the *Nuts registry* or even the *patient callback*, proxied through *service space* for decryption. This will prevent data to scatter all over the place.
-
-The model of the consent record will probably be inspired on the consent FHIR model and future legislation.
 
 Consent bridge
 ==============

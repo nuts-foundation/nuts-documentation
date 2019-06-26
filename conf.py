@@ -206,7 +206,7 @@ modules = ['nuts-discovery', 'nuts-consent-cordapp', 'nuts-crypto']
 def download_repo(repo, branch):
     url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
     ps_process = subprocess.Popen(['curl', url], stdout=subprocess.PIPE)
-    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE)
+    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch), "{}-{}/docs/_static".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE)
     ps_process.stdout.close()
     return grep_process.communicate()[0]
 
