@@ -1,8 +1,8 @@
 .. _nuts-documentation-architecure-overview:
 
-#######################
-High level architecture
-#######################
+############
+Architecture
+############
 
 .. toctree::
     :maxdepth: 1
