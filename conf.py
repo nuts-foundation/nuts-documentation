@@ -203,7 +203,7 @@ epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
 
-modules = ['nuts-discovery', 'nuts-consent-cordapp', 'nuts-crypto']
+modules = ['nuts-discovery', 'nuts-consent-cordapp', 'nuts-crypto', 'nuts-event-octopus']
 
 def download_repo(repo, branch):
     url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
