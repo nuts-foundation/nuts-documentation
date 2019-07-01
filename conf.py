@@ -231,3 +231,4 @@ def config_init_handler(app, config):
 def setup(app):
     app.connect('config-inited', config_init_handler)
     app.add_stylesheet('css/style.css')
+    app.add_stylesheet('css/swagger-ui.css')
