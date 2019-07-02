@@ -14,6 +14,7 @@
 #
 import os
 import sys
+import subprocess
 
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -49,6 +50,8 @@ rtd_version = os.environ.get("READTHEDOCS_VERSION", "latest")
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
+    'sphinxcontrib.httpdomain',
+    'sphinx-jsonschema',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -200,5 +203,32 @@ epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
 
+modules = ['nuts-discovery', 'nuts-consent-cordapp', 'nuts-crypto', 'nuts-event-octopus', 'nuts-registry']
+
+def download_repo(repo, branch):
+    url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
+    ps_process = subprocess.Popen(['curl', url], stdout=subprocess.PIPE)
+    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch), "{}-{}/docs/_static".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE)
+    ps_process.stdout.close()
+    return grep_process.communicate()[0]
+
+def download_module(module, branch):
+    output = download_repo(module, branch)
+    if str.find(str(output), 'tar: Unrecognized archive format'):
+        print("branch {} not found for {}, switching to master".format(branch, module))
+        download_repo(module, 'master')
+
+def config_init_handler(app, config):
+    branch = rtd_version
+
+    if rtd_version == "latest":
+        branch = "master"
+
+    for m in modules:
+        download_module(m, branch)
+
+
 def setup(app):
+    app.connect('config-inited', config_init_handler)
     app.add_stylesheet('css/style.css')
+    app.add_stylesheet('css/swagger-ui.css')

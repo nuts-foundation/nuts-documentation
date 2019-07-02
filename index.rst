@@ -1,12 +1,22 @@
 .. _nuts-documentation:
 
-############################
-Nuts developer documentation
-############################
+##################
+Nuts documentation
+##################
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :caption: Contents:
     :glob:
 
-    pages/*
+    pages/architecture/index.rst
+    pages/technical/index.rst
+    pages/development/index.rst
+    pages/installation/index.rst
+    pages/configuration/index.rst
+    pages/monitoring/index.rst
+    pages/migration/index.rst
+    pages/API/index.rst
+    pages/contribute.rst
+    pages/contact.rst
+

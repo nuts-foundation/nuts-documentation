@@ -1,11 +1,21 @@
-#######################
-High level architecture
-#######################
+.. _nuts-documentation-architecure-overview:
+
+############
+Architecture
+############
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Contents:
+    :hidden:
+    :glob:
+
+    *
 
 The image below is a first attempt to identify all the required components for making Nuts work. All interfaces between components will have a specification. Each vendor has the choice to implements their own components following the spec or just use the components provided by Nuts (mix-and-match).
 
 .. raw:: html
-    :file: ../_static/images/high_level_architecture.svg
+    :file: ../../_static/images/high_level_architecture.svg
 
 At first glance, the different components are divided into four different *spaces*.
 This is done to distinguish between different levels of trust and (probably) different non-functional requirements like scaling.
@@ -156,11 +166,12 @@ There'll probably be two UI's: one for administrative purposes and one for care 
 Consent Cordapp
 ===============
 
+The *Nuts Consent Cordapp* (What is a Cordapp?: https://docs.corda.net/cordapp-overview.html) is responsible for creating the decentralised state of consent.
+The :ref:`nuts-consent-cordapp-technical-model` therefore consists mainly of encrypted data. Validation of any data specific constraints will be delegated to *Service space* during a Corda transaction.
+
 The Corda node which will store all the consent records. Corda has currently been chosen to store the consent. It's unique ability to only include nodes that are part of the consent in the transaction makes it ideal to synchronize personal information. Although the data itself is encrypted, having it all over the place just isn't a good idea. Another plus is that it requires a third party to also acknowledge the transaction (the notary). It can even use a voting scheme to include multiple random notaries. This means that the control over all transactions lies with the community and not a single party.
 
 For every transaction, each involved node needs to approve the transaction according to the logic in the contract. This will rely on data available in the *Nuts registry* or even the *patient callback*, proxied through *service space* for decryption. This will prevent data to scatter all over the place.
-
-The model of the consent record will probably be inspired on the consent FHIR model and future legislation.
 
 Consent bridge
 ==============
@@ -180,6 +191,6 @@ The *Nuts foundation* will also run a *Nuts registry* instance to add the Nuts n
 
 Nuts Consent Discovery
 ======================
-The Corda service that will expose the NetworkMap and network parameters to all Nuts nodes. Each node will cache this data so the discovery service only needs to be up for adding new nodes. This means that the foundation will get an active role in keeping root keys secure and for Nuts nodes.
+The *Nuts Discovery Service* is the Nuts implementation of the Network map service described by *Corda*. The *Corda* specific documentation can be found at https://docs.corda.net/network-map.html. The reason for implementing the network map as a service and not just distributing node information via other means is that this greatly simplifies development, puts the control of the root CA at the right place and creates a bridge to the *Nuts registry*. When a node registers with the discovery service, the service can also add the node to the registry. This will enable node administrators to link care providers to their Nuts node entry in the registry.
 
-
+Corda often speaks of the *Doorman*. This is the *service* that is responsible for approving nodes, eg: signing certificate requests. The *Doorman* uses the intermediate CA to sign Node CA's. Right now, Nuts combines the *Doorman* service and the *NetworkMap* service in the *Nuts discovery Service*.
