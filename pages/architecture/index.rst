@@ -176,7 +176,9 @@ For every transaction, each involved node needs to approve the transaction accor
 Consent bridge
 ==============
 
-The bridge is an abstraction layer for translating the Java specific format from the *Consent Cordapp* to something more usefull for different vendors. This will allow different vendors to be able to use their own technology stack.
+The goal of the *Nuts Consent Bridge* is abstract away from the Corda specific classes and logic. It also exposes logic and data language agnostic.
+Corda is written in Java/Kotlin. The *Nuts Corda Bridge* exposes endpoints using `ZeroMQ <https://zeromq.org>`_. ZeroMQ has support in many languages.
+There are two main interfaces on the bridge: the publish/subscribe endpoint and the request/response endpoint. Check :ref:`nuts-consent-bridge-technical` for more info.
 
 
 ***************
