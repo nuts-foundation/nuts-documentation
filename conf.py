@@ -215,6 +215,7 @@ modules = [
 
 def download_repo(repo, branch):
     url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
+    print("Downloading {}".format(url))
     ps_process = subprocess.Popen(['curl', url], stdout=subprocess.PIPE)
     grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch), "{}-{}/docs/_static".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE)
     ps_process.stdout.close()
@@ -222,6 +223,7 @@ def download_repo(repo, branch):
 
 def download_module(module, branch):
     output = download_repo(module, branch)
+    print("Output: {}").fomat(output)
     if str.find(str(output), 'tar: Unrecognized archive format'):
         print("branch {} not found for {}, switching to master".format(branch, module))
         download_repo(module, 'master')
