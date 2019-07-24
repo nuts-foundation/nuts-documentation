@@ -15,6 +15,7 @@
 import os
 import sys
 import subprocess
+import io
 
 sys.path.insert(0, os.path.abspath('.'))
 
@@ -216,15 +217,17 @@ modules = [
 def download_repo(repo, branch):
     url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
     print("Downloading {}".format(url))
+
     ps_process = subprocess.Popen(['curl', url], stdout=subprocess.PIPE)
-    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch), "{}-{}/docs/_static".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE)
+    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch), "{}-{}/docs/_static".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     ps_process.stdout.close()
-    return grep_process.communicate()[0]
+
+    return grep_process.communicate()[1]
 
 def download_module(module, branch):
     output = download_repo(module, branch)
-    print("Output: {}".format(output))
-    if str.find(str(output), 'tar: Unrecognized archive format'):
+    print("Output: {}".format(str(output)))
+    if str.find(str(output), 'tar: Unrecognized archive format') != -1:
         print("branch {} not found for {}, switching to master".format(branch, module))
         download_repo(module, 'master')
 
