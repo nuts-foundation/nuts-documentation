@@ -203,8 +203,14 @@ If anything did not work out as described above, don't hesitate to :ref:`contact
 Let users authenticate themselves to the Nuts network
 -----------------------------------------------------
 
+Stay tuned!
+
 Let patients record their consent
 ---------------------------------
 
+Bear with us!
+
 Validate incoming api requests
 ------------------------------
+
+Don't touch that dial!
