@@ -212,7 +212,8 @@ modules = [
     'nuts-registry',
     'nuts-consent-bridge',
     'nuts-consent-store',
-    'nuts-network-local']
+    'nuts-network-local',
+    'nuts-auth']
 
 def download_repo(repo, branch):
     url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
