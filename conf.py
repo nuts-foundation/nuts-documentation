@@ -53,6 +53,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinxcontrib.httpdomain',
     'sphinx-jsonschema',
+    'sphinx.ext.autosectionlabel',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -207,6 +208,7 @@ epub_exclude_files = ['search.html']
 modules = [
     'nuts-discovery',
     'nuts-consent-cordapp',
+    'nuts-consent-logic',
     'nuts-crypto',
     'nuts-event-octopus',
     'nuts-registry',
