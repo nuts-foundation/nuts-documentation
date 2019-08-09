@@ -9,7 +9,7 @@ Nuts documentation
     :caption: Contents:
     :glob:
 
-    pages/getting_started.rst
+    pages/getting_started/index.rst
     pages/architecture/index.rst
     pages/technical/index.rst
     pages/development/index.rst

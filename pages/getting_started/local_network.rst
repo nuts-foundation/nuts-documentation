@@ -1,23 +1,3 @@
-Getting Started With Nuts
-=========================
-
-Welcome to the Nuts Getting Started guide. Nuts can help you with mainly two
-common challenges in data exchange between Care Providers:
-
-* Getting data from another party with consent from the patient
-* Providing data to another party with consent from the patient
-
-Some parties need to support only one use-ase, others need both.
-
-Whatever your situation is, you always need to setup your Nuts node first.
-
-This tutorial will help you with:
-
-* :ref:`Setting up a local Nuts network <Setup a local Nuts network>`
-* :ref:`Letting a user identify itself <Let users authenticate themselves to the Nuts network>`
-* :ref:`Record a patients consent <Let patients record their consent>`
-* :ref:`Validate incoming api request <Validate incoming api requests>`
-
 Setup a local Nuts network
 --------------------------
 Since Nuts is a distributed network, every party in the network runs its own node. A node consist of 3 parts:
@@ -184,19 +164,3 @@ Try to inspect the payload to see what you can expect. Hint: its base64 encoded.
 
 That's it. You have just booted a open source distributed health infrasturcture on your computer and recorded your first consent.
 If anything did not work out as described above, don't hesitate to :ref:`contact us<Contact>`.
-
-
-Let users authenticate themselves to the Nuts network
------------------------------------------------------
-
-Stay tuned!
-
-Let patients record their consent
----------------------------------
-
-Bear with us!
-
-Validate incoming api requests
-------------------------------
-
-Don't touch that dial!
