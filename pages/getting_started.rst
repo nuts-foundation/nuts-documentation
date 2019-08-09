@@ -132,27 +132,12 @@ Starting up the nodes
 .. code-block:: console
 
   $ docker-compose up -V
-  Creating network "nuts" with the default driver
-  Pulling notary (nutsfoundation/nuts-consent-cordapp:latest-dev)...
-  latest-dev: Pulling from nutsfoundation/nuts-consent-cordapp
-  f5d23c7fed46: Pull complete
-  eaa7ca9a16a1: Pull complete
-  ...
-  Creating nuts-network-local_dahmer_1                    ... done
-  Creating nuts-network-local_bundy-bridge_1              ... done
-  Creating nuts-network-local_dahmer-nuts-service-space_1 ... done
-  Creating nuts-network-local_bundy_1                     ... done
-  Creating nuts-network-local_dahmer-bridge_1             ... done
-  Creating nuts-network-local_notary_1                    ... done
-  Creating nuts-network-local_bundy-nuts-service-space_1  ... done
-  Attaching to nuts-network-local_dahmer_1, nuts-network-local_notary_1, nuts-network-local_dahmer-nuts-service-space_1, nuts-network-local_bundy_1, nuts-network-local_bundy-bridge_1, nuts-network-local_dahmer-bridge_1, nuts-network-local_bundy-nuts-service-space_1
-  ...
-  dahmer-bridge_1              | [DEBUG] 14:08:18.048 [main] nl.nuts.consent.bridge.listener.CordaStateChangeListener - Started CordaStateChangeListener subscription for class nl.nuts.consent.state.ConsentRequestState
-  dahmer-bridge_1              | [DEBUG] 14:08:18.148 [main] nl.nuts.consent.bridge.listener.CordaStateChangeListener - Started CordaStateChangeListener subscription for class nl.nuts.consent.state.ConsentState
-  bundy-bridge_1               | [DEBUG] 14:08:23.913 [main] nl.nuts.consent.bridge.listener.CordaStateChangeListener - Started CordaStateChangeListener subscription for class nl.nuts.consent.state.ConsentRequestState
-  bundy-bridge_1               | [DEBUG] 14:08:24.418 [main] nl.nuts.consent.bridge.listener.CordaStateChangeListener - Started CordaStateChangeListener subscription for class nl.nuts.consent.state.ConsentState
-  dahmer-bridge_1              | [INFO ] 14:08:25.900 [main] nl.nuts.consent.bridge.ApplicationKt - Started ApplicationKt in 164.694 seconds (JVM running for 195.531)
-  bundy-bridge_1               | [INFO ] 14:08:30.012 [main] nl.nuts.consent.bridge.ApplicationKt - Started ApplicationKt in 173.155 seconds (JVM running for 200.587)
+
+
+.. raw:: html
+
+  <script id="asciicast-GXiWcMMk8nAgPwKHdfswtkGC8" src="https://asciinema.org/a/GXiWcMMk8nAgPwKHdfswtkGC8.js" data-speed="1.7" data-idle-time-limit="0.15" async></script>
+
 
 Congratulations!! You just booted a full Nuts network on you local machine :)
 
