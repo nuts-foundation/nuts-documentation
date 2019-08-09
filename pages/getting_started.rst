@@ -57,14 +57,15 @@ Checkout the nuts network local repository
 Inspect the package
 ^^^^^^^^^^^^^^^^^^^
 
-This project is mainly a docker-compose.yml file, a cordapp and node configuration files.
+This project is mainly a ``docker-compose.yml`` file, a cordapp and node configuration files.
 
 The first node is called bundy, the second dahmer (Any resemblance to serial killers is purely coincidental).
 
-When you inspect the docker-compose.yml you will see two nodes with its 3 applications and a notary.
+When you inspect the `docker-compose.yml <https://github.com/nuts-foundation/nuts-network-local/blob/master/docker-compose.yml>`_ you will see two nodes with its 3 applications and a notary.
 
-Each node has a configuration file in the config/node_name folder.
-It contains a private key, the bridge config (application.properties) and the nuts-go config (nuts.yaml) file.
+Each node has its own configuration directory in the config/node_name folder e.g. `dahmers config <https://github.com/nuts-foundation/nuts-network-local/tree/master/config/dahmer>`_.
+It contains a private key, the bridge config (`application.properties <https://github.com/nuts-foundation/nuts-network-local/blob/master/config/dahmer/application.properties>`_) and the nuts-go config (`nuts.yaml <https://github.com/nuts-foundation/nuts-network-local/blob/master/config/dahmer/nuts.yaml>`_) file.
+Documentation about all these configuration parameters can be found in the :ref:`Configuration section<Configuration>`
 
 The registry config is shared between nodes and contains the addresses and public keys of both nodes.
 You are encouraged to inspect these files.
