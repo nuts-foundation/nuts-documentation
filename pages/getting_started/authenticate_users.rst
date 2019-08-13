@@ -226,7 +226,7 @@ Insert it at the top of your ``views/login.ejs``
   <!--A lib to render qr-codes -->
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <!--The nuts auth js lib -->
-  <script src="https://cdn.jsdelivr.net/npm/@nuts-foundation/auth@0.1.0/index.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@nuts-foundation/auth@0.1.1/index.min.js"></script>
 
 .. note::
 
@@ -248,7 +248,8 @@ There are a few configuration options:
       nutsAuthUrl: "http://localhost:11323",
       qrEl: 'qrcode',
       logLevel: 'debug',
-      postTokenPath: '/users'
+      postTokenPath: '/login',
+      afterSuccessPath: '/users'
     })
     nutsLogin.start();
   </script>
