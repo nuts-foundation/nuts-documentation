@@ -44,7 +44,7 @@ The end result will look like this:
 Creating an empty Express JS application
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For demo purposes we start with an empty generated express js application.
+For demo purposes we start with an empty generated express node.js application.
 If you have an existing app were you would like to implement this, just use that.
 
 
@@ -95,14 +95,31 @@ Start up the empty app
 
 The empty app starts at `<http://localhost:3000>`_
 
-The code so far can be found at `this github branch <https://github.com/nuts-foundation/auth-tutorial/pull/new/empty-app>`_
+The code so far can be found at `this github branch <https://github.com/nuts-foundation/auth-tutorial/tree/empty-app>`_
 
 Create login page
 ^^^^^^^^^^^^^^^^^
 
-Ok, lets make an empty login page.
+Ok, let's begin with making a place to handle session logic, a page to show the
+above IRMA UI, some logic to validate and store the token in a session and some
+logic to for the user to logout.
+We can use the already generated ``/users`` route to show information about the
+current logged in user so lets create a new route for session handling:
 
-We need to add 2 files: A router/controller which handles the request and creates the viewmodel and a template.
+.. code-block:: javascript
+  :name: /routes/session.js
+  :caption: /routes/session.js
+  :linenos:
+
+  var express = require('express');
+  var router = express.Router();
+
+  router.get('/login', function (req, res, next) {
+    res.render('login', {})
+  });
+
+  module.exports = router;
+
 
 .. code-block:: html
   :name: /views/login.ejs
@@ -111,62 +128,49 @@ We need to add 2 files: A router/controller which handles the request and create
 
   <h1>Login with IRMA</h1>
 
-.. code-block:: javascript
-  :name: /routes/login.js
-  :caption: /routes/login.js
-  :linenos:
-
-  var express = require('express');
-  var router = express.Router();
-
-  router.get('/', function (req, res, next) {
-    res.render('login', {})
-  });
-
-  module.exports = router;
-
-Now register the login router in `app.js`:
-
+Now register the session router in `app.js`:
 
 .. code-block:: diff
   :name: app.js
 
-  diff --git a/app.js b/app.js
-  index 3ccf8e4..2da894b 100644
-  --- a/app.js
-  +++ b/app.js
-  @@ -7,6 +7,7 @@ var sassMiddleware = require('node-sass-middleware');
-
    var indexRouter = require('./routes/index');
    var usersRouter = require('./routes/users');
-  +var loginRouter = require('./routes/login');
+  +var sessionRouter = require('./routes/session');
 
    var app = express();
-
-  @@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
-
    app.use('/', indexRouter);
    app.use('/users', usersRouter);
-  +app.use('/login', loginRouter);
+  +app.use('/session', sessionRouter);
 
-   // catch 404 and forward to error handler
-   app.use(function(req, res, next) {
+Change the landing page to display a login link:
+
+.. code-block:: diff
+
+    <p>Welcome to <%= title %></p>
+  + <a href="session/login">Click here to login</a
 
 
-Restart the app and navigate to `<http://localhost:3000/login>`_ to enjoy the result of your hard labour.
+Restart the app and navigate to `<http://localhost:3000/session/login>`_ to enjoy the result of your hard labour.
 
 The code for progress so far can be found `at github <https://github.com/nuts-foundation/auth-tutorial/tree/empty-login-page>`_
 
 Add login html and javascript
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To make it easy to integrate Nuts with your existing application, we provided
-tools to make your life easier.
+To make it convenient to integrate Nuts with your existing application, we provided
+some helpful tools.
 We created a simple styleguide and a javascript IRMA state machine which we will
 now embed on our freshly created login page.
 
-First start by entering the following the html which contains the instructions and states to
-inform the user. The html is taken from the `Nuts irma styleguide <https://nuts-foundation.github.io/irma-web-frontend/section-examples.html>`_.
+Install the two npm packages:
+
+.. code-block:: console
+
+  $ npm add irma-web-frontend @nuts-foundation/auth
+
+First start by pasting the following html which contains the instructions and
+Now, embed the following html on the login.ejs page. The html is taken from the
+`Nuts irma styleguide <https://nuts-foundation.github.io/irma-web-frontend/section-examples.html>`_.
 
 .. code-block:: html
   :linenos:
@@ -174,69 +178,75 @@ inform the user. The html is taken from the `Nuts irma styleguide <https://nuts-
 
   <section class="nuts-login-form irma-web-form">
     <header class="header">
-        <p>Login with <i class="irma-web-logo">IRMA</i></p>
-        <section class="helper">
-            <p>Don't know what to do here? Take a look at the <a href="https://privacybydesign.foundation/irma-begin/">de
-                    website of IRMA</a>.</p>
-        </section>
+      <p>Login with <i class="irma-web-logo">IRMA</i></p>
+      <section class="helper">
+        <p>Don't know what to do here? Take a look at the <a href="https://privacybydesign.foundation/irma-begin/">de
+            website of IRMA</a>.</p>
+      </section>
     </header>
     <section class="content">
-        <section class="centered loading">
-            <div class="irma-web-loading-animation"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-            </div>
-            <p>One moment please...</p>
-        </section>
-        <section class="centered initialized">
-            <div id="qrcode"></div>
-        </section>
-        <section class="centered waiting-for-user">
-            <div class="irma-web-waiting-for-user-animation"></div>
-            <p>Follow the instructions on your phone</p>
-        </section>
-        <section class="centered success">
-            <div class="irma-web-checkmark-animation"></div>
-            <p>Success!</p>
-        </section>
-        <section class="centered expired">
-            <p>The transaction took long</p>
-            <p><a href="#" onclick="nutsLogin.start()">Try again</a></p>
-        </section>
-        <section class="centered cancelled">
-            <p>The transaction got cancelled</p>
-            <p><a href="#" onclick="nutsLogin.start()">Try again</a></p>
-        </section>
-        <section class="centered errored">
-            <p>Something went wrong</p>
-            <p><a href="#" onclick="nutsLogin.start()">Try again</a></p>
-        </section>
+      <section class="centered loading">
+        <div class="irma-web-loading-animation"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        </div>
+        <p>One moment please...</p>
+      </section>
+      <section class="centered initialized">
+        <canvas id="qrcode"></canvas>
+      </section>
+      <section class="centered waiting-for-user">
+        <div class="irma-web-waiting-for-user-animation"></div>
+        <p>Follow the instructions on your phone</p>
+      </section>
+      <section class="centered success">
+        <div class="irma-web-checkmark-animation"></div>
+        <p>Success!</p>
+      </section>
+      <section class="centered expired">
+        <p>The transaction took long</p>
+        <p><a href="#" onclick="nutsLogin.start()">Try again</a></p>
+      </section>
+      <section class="centered cancelled">
+        <p>The transaction got cancelled</p>
+        <p><a href="#" onclick="nutsLogin.start()">Try again</a></p>
+      </section>
+      <section class="centered errored">
+        <p>Something went wrong</p>
+        <p><a href="#" onclick="nutsLogin.start()">Try again</a></p>
+      </section>
     </section>
   </section>
 
-On line #16 you see ``<div id="qrcode"></div>``. This is the element were the
+
+On line #16 you see ``<canvas id="qrcode"></canvas>``. This is the element were the
 qrcode will be shown.
-For this we use a external library `qrcode.js <https://davidshimjs.github.io/qrcodejs/>`_.
 
-Both the qr-code library and the ``@nuts-foundation/auth`` library can be included using this snippet.
-Insert it at the top of your ``views/login.ejs``
 
-.. code-block:: html
+In order to load the css and javascript from both libraries we need to configure
+express to serve static content
 
-  <!--The nuts auth styleguide -->
-  <link rel="stylesheet" href="//nuts-foundation.github.io/irma-web-frontend/application.css" />
-  <!--A lib to render qr-codes -->
-  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
-  <!--The nuts auth js lib -->
-  <script src="https://cdn.jsdelivr.net/npm/@nuts-foundation/auth@0.1.1/index.min.js"></script>
+.. code-block:: diff
+  :caption: app.js
 
-.. note::
+   app.use(express.static(path.join(__dirname, 'public')));
+  +app.use('/scripts/nuts-auth', express.static(__dirname + '/node_modules/@nuts-foundation/auth/dist'));
+  +app.use('/style/irma-web-frontend', express.static(__dirname + '/node_modules/irma-web-frontend/dist'));
 
-  On production environments it is recommended to pin the version of included libraries.
+Include them on top of the login.ejs page
 
-To bring our login screen to live call the ``NutsLogin`` service as provided.
+.. code-block:: diff
+  :caption: views/login.ejs
+
+  +<link rel="stylesheet" href="/style/irma-web-frontend/irma-web-frontend.min.css" />
+  +<script src="/scripts/nuts-auth/browser.js"></script>
+
+   <section class="nuts-login-form irma-web-form">
+
+
+To bring our login screen to life call the ``nutsAuth`` service as provided.
 There are a few configuration options:
 
 * **nutsAuthUrl** The external address of the nuts-node
-* **qrEl** the element to load the qr-code in
+* **qrEl** the canvas element to render the qr-code in
 * **nutsAuthUrl** the address of our bundy nuts node
 * **postTokenPath** the backend path to POST the acquired token to after successful
   login. We will create a route for this later on.
@@ -244,11 +254,11 @@ There are a few configuration options:
 .. code-block:: html
 
   <script>
-    nutsLogin = NutsLogin.init({
+    nutsLogin = nutsAuth.init({
       nutsAuthUrl: "http://localhost:11323",
       qrEl: 'qrcode',
       logLevel: 'debug',
-      postTokenPath: '/login',
+      postTokenPath: '/session/login',
       afterSuccessPath: '/users'
     })
     nutsLogin.start();
@@ -339,7 +349,7 @@ collect a demo agb code from the `IRMA attribute index <https://privacybydesign.
 Choose a random agb code with 8 digits. You can leave the `role` field empty.
 
 Now it's time to test if everything works together. Restart your webserver
-and navigate to `<localhost:3000/login>`_. If everything is alright you will
+and navigate to `<localhost:3000/session/login>`_. If everything is alright you will
 see a qr-code just like in the animation on top of this tutorial page. If not,
 check the console log of your browser.
 
@@ -353,4 +363,97 @@ The example code so far can be found on `the github repo <https://github.com/nut
 Handling a login token
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Please wait while our automatic tutorial generator enjoys his coffee/weekend. We will expand this section soon.
+During the IRMA disclosure/signing session, the frontend is polling the nuts
+node for status changes. After the user successfully discloses its agb code an
+IRMA signature gets returned in the status update. Now the frontend will post
+this signature to the ``postTokenPath`` of our Demo EHR web application.
+
+When our backend receives the token, it needs to check that it is valid.
+The npm package we already installed, contains a simple API wrapper.
+Now, lets create that API endpoint which accepts a POST containing shall we?
+
+The body of the post consists of a hash with only one key: ```nuts_auth_token``.
+The value is a `base64` encoded IRMA signature. The decoded contents is not really
+that interesting for us, but it is for our nuts node! With this token our node can
+determine the user who signed the contract, and if the contract is still valid.
+
+.. code-block:: javascript
+  :linenos:
+  :caption: routes/session.js
+
+  const { nutsAuthClient } = require('@nuts-foundation/auth');
+
+  router.post('/login', async function (req, res, next) {
+    const nutsToken = req.body.nuts_auth_token
+
+    const client = nutsAuthClient('http://localhost:11323', 'Demo EHR');
+    const validationResponse = await client.validateToken(nutsToken);
+
+    const sessionIsValid = validationResponse.validation_result === "VALID";
+
+    if (!sessionIsValid) {
+      res.status(403).send("token invalid");
+      return;
+    }
+
+    // Store token in session information for one hour
+    // Note: the cookie should be signed in production environments
+    res.cookie('nutstoken', nutsToken, {maxAge: 60 * 60 * 1000});
+    res.cookie('agb', validationResponse.signer_attributes['irma-demo.nuts.agb.agbcode'], {maxAge: 60 * 60 * 1000});
+
+    res.status(200).send(validationResponse);
+  });
+
+This will take the token from the post body and post it to the the nuts-auth
+server.
+
+When the UI gets back the 200 it forwards the user to the ``/users`` page.
+Lets make that one too:
+
+.. code-block:: javascript
+  :caption: routes/users.js
+
+  /* GET users listing. */
+  router.all('/', function(req, res, next) {
+    // check if the cookie is set
+    if ('nutstoken' in req.cookies) {
+      next();
+    } else {
+      res.redirect('/session/login');
+    }
+  });
+
+  // render the user page with the agb code
+  router.get('/', function (req, res, next) {
+    const agb = req.cookies.agb;
+    res.render('user', {agb});
+  });
+
+.. code-block:: html
+  :caption: views/user.ejs
+
+  <h1>Welcome user</h1>
+  <p>Your agb is: <%= agb %></p>
+
+  <a href="/session/logout">Click here to logout</a>
+
+We are on a roll! Lets create the logout route as well:
+
+.. code-block:: javascript
+  :caption: routes/session.js
+
+  router.get('/logout', function (req, res, next) {
+    res.clearCookie('nutstoken')
+    res.clearCookie('agb')
+    res.redirect('/')
+  });
+
+You did it! You created a fresh node.js express application. Included the
+nuts npm packages. Added all the views and routes to show an IRMA UI. Contacted
+the server to validate the token and stored it in the users session.
+This token can be used to make request to the nuts network. A subject for a
+future tutorial.
+For now, play around with the code and try to embed this screen in your own
+application.
+
+The full demo source code is available on `this github branch <https://github.com/nuts-foundation/auth-tutorial/tree/validate-token>`_.
