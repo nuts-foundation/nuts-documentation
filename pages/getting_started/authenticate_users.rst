@@ -316,13 +316,13 @@ shown by the :ref:`previous tutorial <Setup a local Nuts network>`.
 
 .. note::
 
-  To save memory and startup time, for this tutorial, you can disable every
-  service in the `docker-compose.yml` except for the `bundy-nuts-service-space`
-  and the network.
+  To save memory and startup time, for this tutorial, we only use one nuts-node.
+  If you want to run the entire distributed network, run: `docker-compose up`
+  instead.
 
 .. code-block:: console
 
-  $ docker-compose up -V
+  $ docker-compose up bundy-nuts-service-space
   Creating network "nuts" with the default driver
   Creating nuts-network-local_bundy-nuts-service-space_1 ... done
   Attaching to nuts-network-local_bundy-nuts-service-space_1
