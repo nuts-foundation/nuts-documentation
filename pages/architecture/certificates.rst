@@ -18,3 +18,12 @@ Extensions
 The vendor CA's will get a x509.v3 extension with a specific oid to indicate what kind of node it is.
 This is needed to distinguish between nodes in the medical, social, insurance or private domain. Some of these domains are not allowed to process BSN's.
 To make sure this is embedded in the security model, it's added to the certificate and must be transferred to issued certificates.
+
+CN
+**
+
+The common name of the certificates used in two-way ssl must conform to the following specification:
+
+    nuts-[network]-[app_name]
+
+where *nuts* is static, *[network]* must be replaced by ``development``, ``test`` or ``production`` and *[app_name]* needs to be replaced with the name also used in the login contracts.
