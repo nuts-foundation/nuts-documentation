@@ -9,18 +9,18 @@ Nuts identifiers use **URN** style representation and use existing URN's where a
 
 The complete Nuts identifiers thus consists of the URN followed by a colon and then the identifying value.
 
-..  code-block::
+.. code-block::
 
     urn:<NID>:<NSS>:<id>
 
-=====================================   ====================    =====================   ================================================================
+=====================================   ====================    =====================   =============================================================================
 Identifier                              Known as                Used in                 Description
-=====================================   ====================    =====================   ================================================================
+=====================================   ====================    =====================   =============================================================================
 urn:oid:2.16.840.1.113883.2.4.6.3       BSN                     Consent                 'Burgerservicenummer' used within the Netherlands for identifying a patient.
 urn:oid:2.16.840.1.113883.2.4.6.1       AGBCode                 Consent/Registry/Auth   The AGBCode as maintained by Vektis for both Organizations and professionals.
 urn:nuts:endpoint                       Endpoint type           Registry                The type of endpoint a URL points to, eg: Consent, Registry or FHIR.
 urn:ietf:rfc:1779                       X500Name                Registry                Name notation used in X509 Certificates. Identifies a Consent Corda node.
-=====================================   ====================    =====================   ================================================================
+=====================================   ====================    =====================   =============================================================================
 
 The choice (for now) has been made to use URN and OID style identifiers.
 URL style identifiers commonly used as namespaces seem to be all over the place and each new project or initiative declares its own namespace for the same identifier.
@@ -31,24 +31,24 @@ Examples
 
 BSN
 ...
-..  code-block::
+.. code-block::
 
     urn:oid:2.16.840.1.113883.2.4.6.3:999999990
 
 AGBCode
 .......
-..  code-block::
+.. code-block::
 
     urn:oid:2.16.840.1.113883.2.4.6.1:00000007
 
 X500Name
 ........
-..  code-block::
+.. code-block::
 
     urn:ietf:rfc:1779:O=Nuts, OU=Healthcare, C=NL, ST=Gelderland, L=Eibergen, CN=nuts_corda_development_local
 
 Endpoint
 ........
-..  code-block::
+.. code-block::
 
     urn:nuts:endpoint:consent
