@@ -134,18 +134,21 @@ More details about the api and its endpoints can be found :ref:`here<Nuts consen
   http://localhost:11323/api/consent \
   -H 'Content-Type: application/json' \
   -d '{
-    "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:999999990",
+    "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:999999900",
     "custodian": "urn:oid:2.16.840.1.113883.2.4.6.1:00000000",
-    "actors": [
-        "urn:oid:2.16.840.1.113883.2.4.6.1:00000001"
-    ],
+    "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
     "performer": "urn:oid:2.16.840.1.113883.2.4.6.1:00000007",
-    "period": {
-        "start": "2019-07-01T12:00:00+02:00",
-        "end": "2020-07-01T12:00:00+02:00"
-    }
+    "records": [{
+    	"consentProof": {
+    		"contentType": "text/plain",
+    		"data": "cGRmIGRvY3VtZW50IHdpdGggc2lnbmF0dXJl"
+    	},
+    	"period": {
+        	"start": "2019-07-04T12:00:00+02:02",
+        	"end": "2020-07-03T12:00:00+02:00"
+    	}
+    }]
   }'
-  {"Actors":["urn:oid:2.16.840.1.113883.2.4.6.1:00000001"],"ConsentProof":null,"Custodian":"urn:oid:2.16.840.1.113883.2.4.6.1:00000000","Performer":"urn:oid:2.16.840.1.113883.2.4.6.1:00000007","Period":{"End":"2020-07-01T12:00:00+02:00","Start":"2019-07-01T12:00:00+02:00"},"Subject":"urn:oid:2.16.840.1.113883.2.4.6.3:999999990"}
 
 You can check the status the process by querying the events endpoint of the event-store:
 
