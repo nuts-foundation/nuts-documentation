@@ -160,6 +160,18 @@ You can check the status the process by querying the events endpoint of the even
 The ``"name":"completed"`` tells you the consent got successfully distributed over both nodes.
 If you don't believe it, checkout the event on dahmer by performing the same request on address ``http://localhost:21323/events``.
 
+To check consents for the combination of actor and subjec you can perform the following query to the consent-store:
+
+.. code-block:: console
+
+  $ curl -X POST \
+  http://localhost:11323/consent/query \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
+  "query": "urn:oid:2.16.840.1.113883.2.4.6.3:999999900"
+  }'
+
 There are quite a few steps to perform by the two nuts nodes before the consent has been recorded. Check out the :ref:`state machine with all the events here<Service space event specification>`.
 
 These events get broadcasted to all parties, including your own application. Thats how you get notified about new patient consents.
