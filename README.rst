@@ -29,4 +29,3 @@ For small changes you might want to add the *clean* directive::
     make clean html
 
 The documentation will then be available from ``_build/html/index.html``
-
