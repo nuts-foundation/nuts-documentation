@@ -177,7 +177,7 @@ Consent bridge
 ==============
 
 The goal of the *Nuts Consent Bridge* is abstract away from the Corda specific classes and logic. It also exposes logic and data language agnostic.
-Corda is written in Java/Kotlin. The *Nuts Corda Bridge* exposes endpoints using `ZeroMQ <https://zeromq.org>`_. ZeroMQ has support in many languages.
+Corda is written in Java/Kotlin. The *Nuts Corda Bridge* emits events using `NATS <https://nats.io>`_. NATS has libraries in many languages.
 There are two main interfaces on the bridge: the publish/subscribe endpoint and the request/response endpoint. Check :ref:`nuts-consent-bridge-technical` for more info.
 
 
