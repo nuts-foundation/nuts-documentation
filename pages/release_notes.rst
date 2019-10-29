@@ -9,7 +9,7 @@ Whats has been changed, and how to update between versions.
 v0.10.0
 *******
 
-See `project details <https://github.com/orgs/nuts-foundation/projects/4>`_ for more details
+See `github project <https://github.com/orgs/nuts-foundation/projects/4>`_ for more details
 
 =======================
 Features / improvements
