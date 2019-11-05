@@ -84,7 +84,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = [u'_build', 'Thumbs.db', '.DS_Store', 'README.rst']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
@@ -240,9 +240,21 @@ def config_init_handler(app, config):
     if rtd_version == "latest":
         branch = "master"
 
+    if rtd_version == "stable":
+        branch = latest_tag()
+
     for m in modules:
         download_module(m, branch)
 
+def latest_tag():
+    git_process = subprocess.Popen(['git', 'tag'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sort_process = subprocess.Popen(['sort', '-r', '--version-sort'], stdin=git_process.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    head_process = subprocess.Popen(['head', '-n1'], stdin=sort_process.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    git_process.stdout.close()
+    sort_process.stdout.close()
+
+    bytes = head_process.communicate()[0]
+    return bytes.decode("utf-8").rstrip()
 
 def setup(app):
     app.connect('config-inited', config_init_handler)
