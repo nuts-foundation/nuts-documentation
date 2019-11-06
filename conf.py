@@ -215,6 +215,7 @@ modules = [
     'nuts-consent-bridge',
     'nuts-consent-store',
     'nuts-network-local',
+    'nuts-fhir-validation',
     'nuts-auth']
 
 def download_repo(repo, branch):
