@@ -33,24 +33,16 @@ Examples
 
 BSN
 ...
-.. code-block::
-
-    urn:oid:2.16.840.1.113883.2.4.6.3:999999990
+`urn:oid:2.16.840.1.113883.2.4.6.3:999999990`
 
 AGBCode
 .......
-.. code-block::
-
-    urn:oid:2.16.840.1.113883.2.4.6.1:00000007
+`urn:oid:2.16.840.1.113883.2.4.6.1:00000007`
 
 X500Name
 ........
-.. code-block::
-
-    urn:ietf:rfc:1779:O=Nuts, OU=Healthcare, C=NL, ST=Gelderland, L=Eibergen, CN=nuts_corda_development_local
+`urn:ietf:rfc:1779:O=Nuts, OU=Healthcare, C=NL, ST=Gelderland, L=Eibergen, CN=nuts_corda_development_local`
 
 Endpoint
 ........
-.. code-block::
-
-    urn:nuts:endpoint:consent
+`urn:nuts:endpoint:consent`
