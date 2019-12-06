@@ -58,7 +58,7 @@ The diagram below shows the flow for retrieving data. Most important to note is 
 
 An actor requests data from another system from the XIS it's working in. The XIS needs the identity of the actor before the request can be made.
 The Nuts node has convenience services for generating a QR-code which can be scanned by the IRMA app. The resulting signature/token can be used in the data call.
-This can be done by calling the correct :ref:`nuts-auth-api` call.
+This can be done by calling the correct :ref:`nuts-auth-api` call. Specification on the IRMA signatures can be found at :ref:`nuts-documentation-login-contracts`.
 
 Given the identity of the current user and the context of the current care organization, the Nuts node can be used to query available consent by calling the :ref:`nuts-consent-store-api`.
 This can be done with or without a patient context. The result will be a class of data that can be retrieved for custodians. The translation of class to resources is future work...
@@ -73,8 +73,9 @@ The data request that arrives at the custodian XIS endpoint will have to be vali
 - are the given identities valid?
 - has consent been given?
 
-The first two can be checked by two API calls on the Nuts node. The return values are nothing more than a yes/no response. More details can be found on the API pages:
+The later two can be checked by two API calls on the Nuts node. The return values are nothing more than a yes/no response. More details can be found on the API pages:
 :ref:`nuts-consent-store-api`, :ref:`nuts-auth-api` and how to implement it: :ref:`nuts-documentation-authenticate`.
+The two-way TLS connection will be established with vendor specific certificates coming from a CA specified in :ref:`nuts-documentation-architecture-certificates`.
 
 .. info::
 

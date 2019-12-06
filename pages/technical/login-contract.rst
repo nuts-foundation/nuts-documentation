@@ -1,3 +1,5 @@
+.. _nuts-documentation-login-contracts:
+
 #######################
 Login Contracts
 #######################
