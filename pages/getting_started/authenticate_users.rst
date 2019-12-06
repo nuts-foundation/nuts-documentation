@@ -1,3 +1,5 @@
+.. _nuts-documentation-authenticate:
+
 Let users authenticate themselves to the Nuts network
 -----------------------------------------------------
 
