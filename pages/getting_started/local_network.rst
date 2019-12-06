@@ -134,19 +134,26 @@ More details about the api and its endpoints can be found :ref:`here<Nuts consen
   http://localhost:11323/api/consent \
   -H 'Content-Type: application/json' \
   -d '{
-    "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:999999900",
+    "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:99999990",
     "custodian": "urn:oid:2.16.840.1.113883.2.4.6.1:00000000",
     "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
     "performer": "urn:oid:2.16.840.1.113883.2.4.6.1:00000007",
     "records": [{
-    	"consentProof": {
-    		"contentType": "text/plain",
-    		"data": "cGRmIGRvY3VtZW50IHdpdGggc2lnbmF0dXJl"
-    	},
-    	"period": {
-        	"start": "2019-07-04T12:00:00+02:02",
-        	"end": "2020-07-03T12:00:00+02:00"
-    	}
+      "consentProof": {
+        "ID": "11112222-2222-3333-4444-555566667777",
+        "title": "Toestemming inzage huisarts.pdf",
+        "URL": "https://some.url/path/to/reference.pdf",
+        "contentType": "application/pdf",
+        "hash": "string"
+      },
+      "previousRecordID": "string",
+      "period": {
+        "start": "2019-05-20T17:02:33+10:00",
+        "end": "2019-11-20T17:02:33+10:00"
+      },
+      "dataClass": [
+        "urn:oid:1.3.6.1.4.1.54851.1:MEDICAL"
+      ]
     }]
   }'
 
@@ -169,7 +176,7 @@ To check consents for the combination of actor and subjec you can perform the fo
   -H 'Content-Type: application/json' \
   -d '{
   "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
-  "query": "urn:oid:2.16.840.1.113883.2.4.6.3:999999900"
+  "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:999999990"
   }'
 
 There are quite a few steps to perform by the two nuts nodes before the consent has been recorded. Check out the :ref:`state machine with all the events here<Service space event specification>`.
