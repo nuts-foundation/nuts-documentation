@@ -9,7 +9,7 @@ The paragraphs below will explain what happens internally and why things work as
 Registering consent
 *******************
 
-The diagram below shows the flow between two parties. The *actor* is the party that wants to retrieve some data about a patient and the *custodian* is the care organization holding the data.
+The diagram below shows the flow between two parties. The *actor* is the party that wants to request some data about a patient and the *custodian* is the care organization holding the data.
 Both parties have their own information system (*XIS*) and both are running a Nuts node within their infrastructure.
 The Nuts registry has been omitted from the flow, but is used internally by the node for translating an organization identifier to endpoint.
 
@@ -22,15 +22,15 @@ The result is a handle to the transaction which can be used to follow the state 
 It's unwise to make this a synchronous process since there's no limit on how long the transaction can take.
 
 All nodes that are involved in the transaction must validate the transaction. The transaction must be validated technically (syntax, references, timestamps) and contextually.
-Each node must validate that the `BSN` indeed belongs to a patient registered in the local XIS (due to legislation, ID card check and such).
+Each node must validate that the `BSN` indeed belongs to a patient registered in the local XIS (due to legislation, ID card check and such) or will be in the near future.
 If a patient is not in care at one of the nodes, the transaction will be cancelled. An `ack` by a node is represented as a :ref:`Sign Consent Branch` flow in Corda.
 
 .. note::
 
-    A node that starts too many invalid transaction might be an indication that a node is misbehaving and must be isolated in the network.
+    When a node starts too many invalid transactions, it might be an indication that the specific node is misbehaving and must be isolated in the network.
     A symptom might be a lot of negative responses to the `patient_in_care()` call.
 
-Validation by a node is done by adding a signature. In the diagram this is shown by the `sign()` call and `Sig` abstraction.
+Transaction validation by a node is done by adding a signature. In the diagram this is shown by the `sign()` call and `Sig` abstraction.
 The initiating node does this as well, but most likely does this in an automated way.
 The other nodes can choose to do it automatically by searching for a patient (by bsn) in their own records or manually validate it through an UI.
 For most of the implicit consents, a patient record will not be available yet at the *XIS actor* part.
