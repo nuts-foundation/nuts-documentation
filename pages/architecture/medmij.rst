@@ -1,6 +1,10 @@
 Medmij authentication flow using Irma
 #####################################
 
+.. warning::
+
+    the proposal below is just that, a proposal. A prototype still has to be built.
+
 The image below is a first attempt to solve the Medmij authentication flow using Irma instead of Digid. This is strictly a proposal and is being discussed with Medmij.
 
 .. figure:: /_static/images/nuts-medmij-irma-auth-flow.png

@@ -146,7 +146,6 @@ More details about the api and its endpoints can be found :ref:`here<Nuts consen
         "contentType": "application/pdf",
         "hash": "string"
       },
-      "previousRecordID": "string",
       "period": {
         "start": "2019-05-20T17:02:33+10:00",
         "end": "2019-11-20T17:02:33+10:00"
@@ -181,8 +180,8 @@ To check consents for the combination of actor and subjec you can perform the fo
 
 There are quite a few steps to perform by the two nuts nodes before the consent has been recorded. Check out the :ref:`state machine with all the events here<Service space event specification>`.
 
-These events get broadcasted to all parties, including your own application. Thats how you get notified about new patient consents.
+These events get broadcast to all parties, including your own application. That's how you get notified about new patient consents.
 Try to inspect the payload to see what you can expect. Hint: its base64 encoded.
 
-That's it. You have just booted a open source distributed health infrasturcture on your computer and recorded your first consent.
+That's it. You have just booted a open source distributed health infrastructure on your computer and recorded your first consent.
 If anything did not work out as described above, don't hesitate to :ref:`contact us<Contact>`.

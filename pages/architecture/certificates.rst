@@ -27,3 +27,7 @@ The common name of the certificates used in two-way ssl must conform to the foll
     nuts-[network]-[app_name]
 
 where *nuts* is static, *[network]* must be replaced by ``development``, ``test`` or ``production`` and *[app_name]* needs to be replaced with the name also used in the login contracts.
+
+.. note::
+
+    The specification of the CN might be changed to a certificate extension in the future, which will allow the CN to be freely choosen.
