@@ -16,9 +16,9 @@ Features / improvements
 =======================
 
 * A version number has been added to the FHIR consent record (:ref:`nuts-fhir-validation-requirements`) which is also visible in the consent-store.
-Currently, the API's will only return the latest version. The version is mainly for forwards compatibility and for viewing changes in consent in the future.
+Currently, the API's will only return the latest version. The version is mainly for forwards compatibility and for viewing changes in consent in future releases.
 * The consent-store query API has been changed to return a `PatientConsent` model instead of a `SimplifiedConsent` model , ref: :ref:`nuts-consent-store-api`.
-* Changed consent on the level of individual FHIR resources (Patient, Observation, etc) to data classes (Medical, Social, Mental) across all modules.
+* Changed consent on the level of individual FHIR resources (Patient, Observation, etc) to data classes (Medical, Social, Mental) across all modules. Mapping individual FHIR resources to and from classes is future work.
 * Public keys in registry can now be stored in JWK format. All api's that request or return public keys can handle JWK format.
 * Period dates in the consent store have been changed to datetime objects instead of dates.
 This is mainly done for when consent is withdrawn, it should not be active for the rest of the day.
