@@ -39,12 +39,12 @@ Example
 Using regular expressions, a machine can extract all the relevant variables::
 
   /(language):(Contract-name):(version) Ondergetekende geeft hierbij toestemming aan
-  (Acting Party) om uit naam van ondergetekende (Scope) ten behoeven van (Purpose).
+  (Acting Party) om namens (Legal Entity) en ondergetekende (Scope) ten behoeven van (Purpose).
   Deze toestemming is geldig (period)./
 
 Examples:
 
-NL:Login:v1 Ondergetekende geeft hierbij toestemming aan *SoftwareApplicatie* om uit naam van ondergetekende *data op te vragen, data aan te passen* ten behoeven van *het verlenen van goede zorg*. Deze toestemming is geldig tot *2019-02-06T21:00*.
+NL:Login:v1 Ondergetekende geeft hierbij toestemming aan *SoftwareApplicatie* om uit naam van *Zorgorganisatie* en ondergetekende *data op te vragen, data aan te passen* ten behoeven van *het verlenen van goede zorg*. Deze toestemming is geldig tot *2019-02-06T21:00*.
 
 NL:Gegevensverwerking:v3 Ondergetekende geeft hierbij toestemming aan *Medians* om uit naam van ondergetekende *data op te vragen, data te verzamelen* ten behoeven van *het doen van medisch onderzoek*. Deze toestemming is geldig tot *2020-02-06T21:00*.
 
@@ -78,6 +78,12 @@ Purpose: Only the acting party is given the permission.
 
 In case of a Nuts party, We can use the X.509 CommonName used in the Directory service for software names.
 In case of people, we can use relevant attributes such as a name, medical expertise or medical registration number (BIG, AGB).
+
+Legal Entity
+------------
+Purpose: limit the consent to only a single care organisation.
+
+The name of the care organisation must match with on in the Nuts registry.
 
 Period
 ------
