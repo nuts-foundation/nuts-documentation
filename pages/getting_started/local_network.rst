@@ -6,18 +6,18 @@ Since Nuts is a distributed network, every party in the network runs its own nod
 * A `Corda application <https://github.com/nuts-foundation/nuts-consent-cordapp>`_ which contains all the logic for signing and distributing patient consents
 * A `bridge application <https://github.com/nuts-foundation/nuts-consent-bridge>`_ between the Corda application and the nuts-go application
 
-All three applications are containerized and can be found on `Docker hub <https://hub.docker.com/u/nutsfoundation>`_.
+All three applications are containerized and can be found on `Docker Hub <https://hub.docker.com/u/nutsfoundation>`_.
 
 The easiest way for starting up a local development network is by using the docker-compose configuration.
 
-This requires docker and Java installed
+This requires docker and Java 8 to be installed.
 
 +------------------------------------------------------+----------------------------------+
 | Useful links                                         | Description                      |
 +======================================================+==================================+
-| `Docker <https://docs.docker.com/get-started/>`_     | Introdcution into docker         |
+| `Docker <https://docs.docker.com/get-started/>`_     | Introduction into docker         |
 +------------------------------------------------------+----------------------------------+
-| `Docker compose <https://docs.docker.com/compose/>`_ | Introdcution into docker-compose |
+| `Docker compose <https://docs.docker.com/compose/>`_ | Introduction into docker-compose |
 +------------------------------------------------------+----------------------------------+
 
 Checkout the nuts network local repository
@@ -39,7 +39,7 @@ Inspect the package
 
 This project is mainly a ``docker-compose.yml`` file, a cordapp and node configuration files.
 
-The first node is called bundy, the second dahmer (Any resemblance to serial killers is purely coincidental).
+The first node is called bundy, the second dahmer (any resemblance to serial killers is purely coincidental).
 
 When you inspect the `docker-compose.yml <https://github.com/nuts-foundation/nuts-network-local/blob/master/docker-compose.yml>`_ you will see two nodes with its 3 applications and a notary.
 
@@ -104,7 +104,8 @@ Starting up the nodes
 
   if you get the following error:
   ``msg="Could not initialize IRMA library:" error="Error parsing scheme manager irma-demo: Could not read scheme manager timestamp: <nil>"``
-  This happens sometimes during first boot since the irma schema is shared between nodes and one of the nodes is downloading it, the other cant access it.
+  This happens sometimes during first boot since the irma schema is shared between nodes and one of the nodes is downloading it, the other can't access it.
+  If this is the case, simply stop the stack and start it again.
 
 .. note::
 
@@ -120,7 +121,7 @@ Starting up the nodes
   <script id="asciicast-GXiWcMMk8nAgPwKHdfswtkGC8" src="https://asciinema.org/a/GXiWcMMk8nAgPwKHdfswtkGC8.js" data-speed="1.7" data-idle-time-limit="0.15" async></script>
 
 
-Congratulations!! You just booted a full Nuts network on you local machine :)
+Congratulations!! You just booted a full Nuts network on your local machine :)
 
 Record your first consent
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -178,10 +179,10 @@ To check consents for the combination of actor and subjec you can perform the fo
   "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:999999990"
   }'
 
-There are quite a few steps to perform by the two nuts nodes before the consent has been recorded. Check out the :ref:`state machine with all the events here<Service space event specification>`.
+There are quite a few steps to perform by the two nuts nodes before the consent is recorded. Check out the :ref:`state machine with all the events here<Service space event specification>`.
 
 These events get broadcast to all parties, including your own application. That's how you get notified about new patient consents.
-Try to inspect the payload to see what you can expect. Hint: its base64 encoded.
+Try to inspect the payload to see what you can expect. Hint: it's base64 encoded.
 
-That's it. You have just booted a open source distributed health infrastructure on your computer and recorded your first consent.
+That's it. You have just booted an open source distributed health infrastructure on your computer and recorded your first consent.
 If anything did not work out as described above, don't hesitate to :ref:`contact us<Contact>`.
