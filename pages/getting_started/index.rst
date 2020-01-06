@@ -19,7 +19,7 @@ common challenges in data exchange between Care Providers:
 * Getting data from another party with consent from the patient
 * Providing data to another party with consent from the patient
 
-Some parties need to support only one use-ase, others need both.
+Some parties need to support only one use-case, others need both.
 
 Whatever your situation is, you always need to setup your Nuts node first.
 
