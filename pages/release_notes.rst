@@ -6,6 +6,30 @@ Release notes
 Whats has been changed, and how to update between versions.
 
 *******
+v0.11.2
+*******
+
+See `github project <https://github.com/orgs/nuts-foundation/projects/11>`_ for more details
+
+========
+Bugfixes
+========
+
+* Consent conversion from and to the internal FHIR record was broken due to missing namespacing. (https://github.com/nuts-foundation/nuts-fhir-validation/issues/8)
+  Additionally the dataClass format is also checked in the consent POST call. (https://github.com/nuts-foundation/nuts-consent-logic/issues/23)
+* The validity period now uses DateTime values instead of LocalDates. This is needed to end a particular consent immediately. (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/32)
+* Searching and checking active consent could result in the wrong answer when a newer version ended consent. (https://github.com/nuts-foundation/nuts-consent-store/issues/24)
+* ValidTo is now optional in a validity period. There was a mismatch between different parts of the system.
+* Searching for consent with a validAt parameter used string comparison and not date comparison. (https://github.com/nuts-foundation/nuts-consent-store/issues/22)
+* RFC3339 time notation is now used for all dateTime values. https://github.com/nuts-foundation/nuts-consent-store/issues/25)
+
+======================
+Upgrading from v0.11.0
+======================
+
+Because of the corrupted dataClasses, all data has to be wiped. Both the `persistence.mv` for Corda and the sqlite DB for the consent store have to be deleted.
+
+*******
 v0.11.0
 *******
 
