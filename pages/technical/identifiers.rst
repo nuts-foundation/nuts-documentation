@@ -46,7 +46,7 @@ AGBCode
 
 Hospital OID
 ............
-In this case the hospital has it's own OID.
+In this case the hospital has its own OID.
 ::
 
     urn:ietf:rfc:3986:2.16.840.1.113883.2.4.3.55
