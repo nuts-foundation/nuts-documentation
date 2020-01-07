@@ -22,6 +22,7 @@ urn:oid:1.3.6.1.4.1.54851               Nuts root OID                           
 urn:oid:1.3.6.1.4.1.54851.1             Nuts consent classes    Consent                 Consent classifier ID, eg: urn:oid:1.3.6.1.4.1.54851.1:MEDICAL.
 urn:nuts:endpoint                       Endpoint type           Registry                The type of endpoint a URL points to, eg: Consent, Registry or FHIR.
 urn:ietf:rfc:1779                       X500Name                Registry                Name notation used in X509 Certificates. Identifies a Consent Corda node.
+urn:ietf:rfc:3986                       URI                     Consent/Registry/Auth   Indication the value is of type URI, should be used to indicate an OID
 =====================================   ====================    =====================   =============================================================================
 
 The choice (for now) has been made to use URN and OID style identifiers.
@@ -42,6 +43,13 @@ AGBCode
 ::
 
     urn:oid:2.16.840.1.113883.2.4.6.1:00000007
+
+Hospital OID
+............
+In this case the hospital has it's own OID.
+::
+
+    urn:ietf:rfc:3986:2.16.840.1.113883.2.4.3.55
 
 X500Name
 ........
