@@ -20,7 +20,7 @@ urn:oid:2.16.840.1.113883.2.4.6.3       BSN                     Consent         
 urn:oid:2.16.840.1.113883.2.4.6.1       AGBCode                 Consent/Registry/Auth   The AGBCode as maintained by Vektis for both Organizations and professionals.
 urn:oid:1.3.6.1.4.1.54851               Nuts root OID                                   Root OID used for mounting point of Nuts classifiers.
 urn:oid:1.3.6.1.4.1.54851.1             Nuts consent classes    Consent                 Consent classifier ID, eg: urn:oid:1.3.6.1.4.1.54851.1:MEDICAL.
-urn:nuts:endpoint                       Endpoint type           Registry                The type of endpoint a URL points to, eg: Consent, Registry or FHIR.
+urn:oid:1.3.6.1.4.1.54851.2             Nuts endpoint types     Registry                The type of endpoint a URL points to, eg: Consent, Registry or FHIR.
 urn:ietf:rfc:1779                       X500Name                Registry                Name notation used in X509 Certificates. Identifies a Consent Corda node.
 urn:ietf:rfc:3986                       URI                     Consent/Registry/Auth   Indication the value is of type URI, should be used to indicate an OID
 =====================================   ====================    =====================   =============================================================================
@@ -57,8 +57,9 @@ X500Name
 
     urn:ietf:rfc:1779:O=Nuts, OU=Healthcare, C=NL, ST=Gelderland, L=Eibergen, CN=nuts_corda_development_local
 
-Endpoint
+Consent Endpoint
 ........
+Endpoint to connect with to synchronise consents
 ::
 
-    urn:nuts:endpoint:consent
+    urn:oid:1.3.6.1.4.1.54851.2:consent
