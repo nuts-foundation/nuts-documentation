@@ -100,8 +100,6 @@ The JWT used to obtain the token should consists of the following fields:
     "usi": {...irma based signature...},
     "osi": {...hardware token sig...},
     "con": {...additional context...},
-    "ccn": "CN=client_common_name",
-    "icn": "CN=issuer_common_name",
     "exp": max(time_from_irma_sign, some_limited_time),
     "iat": "",
     "jti": {unique-identifier}
@@ -140,14 +138,6 @@ Ops signature, optional signature coming from a hardware token, indicating the u
 Con
 ---
 Base64 encoded json representing key-value pairs for additional context for the requested access token. Such as task flow selection.
-
-Ccn
----
-Client certificate common name. The CN from the client certificate used for the TLS connection which was used for making the request.
-
-Icn
----
-Common name of the issuer of the ccn. This certificate must be direct verifiable with the Nuts CA tree.
 
 Exp
 ---
