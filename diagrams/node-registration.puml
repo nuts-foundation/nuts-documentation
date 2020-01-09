@@ -1,0 +1,30 @@
+@startuml
+
+== Enrolment ==
+actor "Node Admin"
+"Node Admin" -> "Node B" : inital registration
+"Node B" -> "Node B" : generate keypair
+"Node B" -> "Node B" : create CSR
+"Node B" -> "Nuts Discovery" : request certificate (CSR)
+
+actor "Nuts Admin"
+"Nuts Admin" -> "Nuts Discovery" : sign CSR
+
+
+"Node B" -> "Nuts Discovery" : retrieve certificate (ID)
+note left
+    This is a polling call
+end note
+"Nuts Discovery" --> "Node B" : certificate
+
+== Publish node to network map ==
+"Node B" -> "Node B" : sign node info
+"Node B" -> "Nuts Discovery" : publish node info
+
+"Nuts Discovery" -> "Nuts Discovery" : update & sign network map
+
+== Update network map (scheduled) ==
+
+"Node A" -> "Nuts Discovery" : retrieve network map
+"Nuts Discovery" --> "Node A" : updated network map
+@enduml

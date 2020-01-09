@@ -1,0 +1,20 @@
+@startuml
+title Nuts Discovery
+:Node Admin: -> (1. Register node)
+:Nuts Admin: -> (2. Accept node registration)
+
+newpage
+
+title Nuts Registry
+:Nuts Admin: -> (3. Register vendor)
+:Vendor Admin: -> (4. Register organisation)
+:Vendor Admin: -down-> (6. Register/update organisation endpoint)
+:Org. Admin: -> (5. Accept vendor registration)
+node System
+System -> (7. Publish changes)
+System -down-> (8. Verify received changes)
+
+'layout
+:Nuts Admin: -[hidden]- :Org. Admin:
+:Org. Admin: -[hidden]- :System:
+@enduml
