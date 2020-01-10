@@ -15,6 +15,7 @@ Then install the following components using **pip**::
     pip install recommonmark
     pip install sphinx_rtd_theme
     pip install sphinxcontrib.httpdomain
+    pip install sphinx-jsonschema
 
 For MacOS make sure the sphinx executables are added to your PATH::
 
