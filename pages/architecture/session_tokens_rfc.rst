@@ -8,6 +8,12 @@ to contextual information of the request.
 A session is scoped to an actor, subject and custodian. Optionally a reference
 to a specific consent record can be provided.
 
+Status of this RFC
+##################
+
+This RFC is a work in progress. See the TODO section below. To provide comments
+create an issue on the Github repository containing this documentation.
+
 Motivation
 **********
 
@@ -149,7 +155,7 @@ placing personal information into the registry.
 
 con
 ===
-Base64 encoded JSON representing key-value pairs for additional context for the 
+Base64 encoded JSON representing key-value pairs for additional context for the
 requested access token. Such as task flow selection.
 
 exp
