@@ -9,7 +9,7 @@ A session is scoped to an actor, subject and custodian. Optionally a reference
 to a specific consent record can be provided.
 
 Status of this RFC
-##################
+******************
 
 This RFC is a work in progress. See the TODO_ section below. To provide comments
 create an issue on the `Github repository containing this documentation <https://github.com/nuts-foundation/nuts-documentation/issues>`_.
@@ -64,7 +64,7 @@ at once, is not possible. We could consider allowing list of subjects during the
 token requests.
 
 Mechanics
-#########
+*********
 
 To resolve above issues, we'll introduce *sessions*. A session lives on the
 custodian side and contains information about the subject, actor and custodian.
@@ -192,7 +192,7 @@ Unique identifier, secure random number to prevent replay attacks. The
 authorization server must check this!
 
 TODO
-####
+****
 
 Some things have to be defined:
 
