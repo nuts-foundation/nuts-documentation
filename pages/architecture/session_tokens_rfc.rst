@@ -12,7 +12,7 @@ Status of this RFC
 ##################
 
 This RFC is a work in progress. See the TODO_ section below. To provide comments
-create an issue on the Github repository containing this documentation.
+create an issue on the `Github repository containing this documentation <https://github.com/nuts-foundation/nuts-documentation/issues>`_.
 
 Motivation
 **********
