@@ -18,6 +18,7 @@ Nuts documentation
     pages/monitoring/index.rst
     pages/migration/index.rst
     pages/API/index.rst
+    pages/rfc/index.rst
     pages/contribute.rst
     pages/release_notes.rst
     pages/contact.rst
