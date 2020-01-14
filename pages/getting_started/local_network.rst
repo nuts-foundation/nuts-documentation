@@ -10,7 +10,7 @@ All three applications are containerized and can be found on `Docker Hub <https:
 
 The easiest way for starting up a local development network is by using the docker-compose configuration.
 
-This requires docker and Java 8 to be installed.
+This requires Docker to be installed.
 
 +------------------------------------------------------+----------------------------------+
 | Useful links                                         | Description                      |
@@ -53,48 +53,47 @@ You are encouraged to inspect these files.
 Generate the corda nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Get the Corda network bootstrapper tool from https://repo1.maven.org/maven2/net/corda/corda-tools-network-bootstrapper/4.1/
+Get the Corda network bootstrapper tool from https://repo1.maven.org/maven2/net/corda/corda-tools-network-bootstrapper/4.3/
 and generate the 2 network nodes + notary:
 
 .. code-block:: console
 
   $ cd nuts-network-local
   $ cd nodes
-  $ curl -O https://repo1.maven.org/maven2/net/corda/corda-tools-network-bootstrapper/4.1/corda-tools-network-bootstrapper-4.1.jar
+  $ curl -O https://repo1.maven.org/maven2/net/corda/corda-tools-network-bootstrapper/4.3/corda-tools-network-bootstrapper-4.3.jar
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                 Dload  Upload   Total   Spent    Left  Speed
   100  108M  100  108M    0     0  27.7M      0  0:00:03  0:00:03 --:--:-- 27.7M
 
-  $ java -jar corda-tools-network-bootstrapper-4.1.jar --dir .
-  Bootstrapping local test network in /Users/steven.vandervegt/projects/nuts/playground/nuts-network-local/nodes
+  $ docker run --mount type=bind,source="$(pwd)",target=/opt/app openjdk:8-jdk-slim java -jar /opt/app/corda-tools-network-bootstrapper-4.3.jar --dir /opt/app
+  Bootstrapping local test network in /opt/app
   Generating node directory for dahmer
   Generating node directory for bundy
   Generating node directory for notary
   Nodes found in the following sub-directories: [notary, dahmer, bundy]
-  Found the following CorDapps: [contract-0.6.1.jar, flows-0.6.1.jar]
-  Copying CorDapp JARs into node directories
+  Found the following CorDapps: [flows-0.11.0.jar, contract-0.11.0.jar]
+  Not copying CorDapp JARs as --copy-cordapps is set to FirstRunOnly, and it looks like this network has already been bootstrapped.
   Waiting for all nodes to generate their node-info files...
   ... still waiting. If this is taking longer than usual, check the node logs.
   Distributing all node-info files to all nodes
-  Loading existing network parameters... none found
-  Gathering notary identities
-  Generating contract implementations whitelist
-  QUASAR WARNING: Quasar Java Agent isn't running. If you're using another instrumentation method you can ignore this message; otherwise, please refer to the Getting Started section in the Quasar documentation.
-  New NetworkParameters {
-        minimumPlatformVersion=4
+  Loading existing network parameters... NetworkParameters {
+        minimumPlatformVersion=5
         notaries=[NotaryInfo(identity=CN=nuts_corda_development_notary, O=Nuts, L=Groenlo, C=NL, validating=false)]
         maxMessageSize=10485760
         maxTransactionSize=524288000
         whitelistedContractImplementations {
-          nl.nuts.consent.contract.ConsentContract=[C689369163A4B1A2960AC90193ADD6C8470D6E48D57199B5DCC7B359C9953AC6]
+
         }
         eventHorizon=PT720H
         packageOwnership {
 
         }
-        modifiedTime=2019-08-08T13:40:37.387Z
+        modifiedTime=2020-01-06T16:02:28.519Z
         epoch=1
     }
+  Gathering notary identities
+  Generating contract implementations whitelist
+  Network parameters unchanged
   Bootstrapping complete!
 
 Starting up the nodes
