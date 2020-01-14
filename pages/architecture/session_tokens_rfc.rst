@@ -86,7 +86,7 @@ This will be described in another RFC.
 As the rfc7523 describes, a JWT should be build and posted to the Authorization Server
 (Nuts node or own implementation). The Authorization Server checks all requirements
 like a valid consent, validity of the session token, match of clientID and Actor etc.
-If everything is valid, it creates a session and the session token which should 
+If everything is valid, it creates a session and the session token which should
 be returned.
 
 The client can now perform API requests using the same mutual SSL connection
@@ -96,6 +96,9 @@ Authorization Header. Contrary to the
 `original OAuth 2 definition <https://tools.ietf.org/html/rfc6750#section-1.2>`_
 of a Bearer token, the token is bound to the client by its two way (mutual) SSL
 certificate.
+
+The XIS receiving the session token can retrieve the session by
+`token introspection <https://tools.ietf.org/html/rfc7662>`_.
 
 .. raw:: html
   :file: ../../_static/images/nuts_session-tokens.svg
