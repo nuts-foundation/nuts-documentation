@@ -70,16 +70,32 @@ To resolve above issues, we'll introduce *sessions*. A session lives on the
 custodian side and contains information about the subject, actor and custodian.
 Additional information can be stored like, session expiration and consent reference.
 
-To refer to a session during an API call, a reference to the session must be provided.
+To **obtain the users identity**, the users follows a standard Login flow presenting
+its attributes using IRMA, signing the LoginContract. The signed contract can
+be stored by the users XIS in a session for the validity of the contract.
+
+Once the user wants to request data about a subject, a **session token must be obtained**.
+The session token can be acquired using an OAuth 2.0 flow with the
+`urn:ietf:params:oauth:grant-type:jwt-bearer` grant_type. This profile is
+described in `RFC7523 <https://tools.ietf.org/html/rfc7523>`_.
+
+For Actor identification the requests will be performed over a mutual SSL connection.
+The client will use a certificate signed by the CA of the custodian.
+This will be described in another RFC.
+
+As the rfc7523 describes, a JWT should be build and posted to the Authorization Server
+(Nuts node or own implementation). The Authorization Server checks all requirements
+like a valid consent, validity of the session token, match of clientID and Actor etc.
+If everything is valid, it creates a session and the session token which should 
+be returned.
+
+The client can now perform API requests using the same mutual SSL connection
+providing the session token along with the request.
 For example, in the case of a HTTP REST call in the form of a bearer token in the
 Authorization Header. Contrary to the
 `original OAuth 2 definition <https://tools.ietf.org/html/rfc6750#section-1.2>`_
 of a Bearer token, the token is bound to the client by its two way (mutual) SSL
 certificate.
-
-The session token can be acquired using an OAuth 2.0 flow with the
-`urn:ietf:params:oauth:grant-type:jwt-bearer` grant_type. This profile is
-described in `RFC7523 <https://tools.ietf.org/html/rfc7523>`_.
 
 .. raw:: html
   :file: ../../_static/images/nuts_session-tokens.svg
