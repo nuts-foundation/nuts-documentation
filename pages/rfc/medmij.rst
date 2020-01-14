@@ -1,4 +1,4 @@
-Medmij authentication flow using Irma
+RFC: Medmij authentication flow using Irma
 #####################################
 
 .. warning::
