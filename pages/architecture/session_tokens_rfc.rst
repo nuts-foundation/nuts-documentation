@@ -11,7 +11,7 @@ to a specific consent record can be provided.
 Status of this RFC
 ##################
 
-This RFC is a work in progress. See the TODO section below. To provide comments
+This RFC is a work in progress. See the TODO_ section below. To provide comments
 create an issue on the Github repository containing this documentation.
 
 Motivation
@@ -190,3 +190,11 @@ jti
 ===
 Unique identifier, secure random number to prevent replay attacks. The
 authorization server must check this!
+
+TODO
+####
+
+Some things have to be defined:
+
+* the exact formats of API calls
+* the mechanisms of mutual SSL
