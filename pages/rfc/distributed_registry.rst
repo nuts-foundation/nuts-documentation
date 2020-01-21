@@ -179,8 +179,8 @@ Vendor Claim Event Payload
 ======================  =====
 Field                   Format
 ======================  =====
-Care organisation       OID
-Vendor                  OID
+Care organisation       URN
+Vendor                  URN
 Start date              RFC 3339 timestamp
 End date                RFC 3339 timestamp (optional)
 Certificate             JWK encoded X.509
@@ -207,8 +207,8 @@ Endpoint Registration Event Payload
 ======================  =====
 Field                   Format
 ======================  =====
-Care organisation       OID
-Vendor                  OID
+Care organisation       URN
+Vendor                  URN
 Endpoint ID             URN
 Endpoint type           URN
 Endpoint location       URL
