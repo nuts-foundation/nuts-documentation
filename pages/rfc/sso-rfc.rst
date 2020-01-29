@@ -56,7 +56,7 @@ Basic flow
 8. The source application looks up the care providers vendor jump URL in the Nuts registry
 9. The source application redirects the user to the jump url with the session token in the URL
 10. The destination Authorization Server checks the session token by sending it to its local Nuts Node, gets the session, checks it, invalidates it
-11 The destination Authorization Server creates an internal URL and session and redirects the user
+11. The destination Authorization Server creates an internal URL and session and redirects the user
 12. The destination application shows the page with the client context from the session token
 
 Obtain session token
@@ -68,17 +68,20 @@ Endpoints
 =========
 
 The an registry endpoint should use the following identifier:
-`urn:oid:1.3.6.1.4.1.54851.1:nuts-sso`
+::
+
+    urn:oid:1.3.6.1.4.1.54851.1:nuts-sso
 
 Jump
 ====
 
 The user gets a status 303 or 303 with the jump sso url including the session token.
 
-```
-HTTP/1.1 302 Found
-Location: https://auth.destination-application.nl?session_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-```
+.. code-block:: http
+
+  HTTP/1.1 302 Found
+  Location: https://auth.destination-application.nl?session_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
 
 TODO
 ****
