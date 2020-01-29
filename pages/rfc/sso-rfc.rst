@@ -49,15 +49,15 @@ Basic flow
 1. The User loads a page in a patient context
 2. The source application checks rights and settings to see if this user is allows to jump (local policy)
 3. The source application checks if the patient has any external care providers with jumpable applications (Nuts registry)
-3. The source application renders an SSO button
-4. The User clicks the button
-5. The source application collects the users identity using a login contract. If not already present, it lets the user sign one using IRMA
-6. The source application requests a session token providing user identity, patient BSN, Care Provider AGB
-7. The source application looks up the care providers vendor jump URL in the Nuts registry
-8. The source application redirects the user to the jump url with the session token in the URL
-9. The destination Authorization Server checks the session token by sending it to its local Nuts Node, gets the session, checks it, invalidates it
-10 The destination Authorization Server creates an internal URL and session and redirects the user
-11. The destination application shows the page with the client context from the session token
+4. The source application renders an SSO button
+5. The User clicks the button
+6. The source application collects the users identity using a login contract. If not already present, it lets the user sign one using IRMA
+7. The source application requests a session token providing user identity, patient BSN, Care Provider AGB
+8. The source application looks up the care providers vendor jump URL in the Nuts registry
+9. The source application redirects the user to the jump url with the session token in the URL
+10. The destination Authorization Server checks the session token by sending it to its local Nuts Node, gets the session, checks it, invalidates it
+11 The destination Authorization Server creates an internal URL and session and redirects the user
+12. The destination application shows the page with the client context from the session token
 
 Obtain session token
 ====================
