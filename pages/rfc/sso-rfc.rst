@@ -87,4 +87,9 @@ TODO
 ****
 
 Determine which IRMA attributes are needed.
-Do we need a seperate Jump contract?
+
+Do we need a separate Jump contract?
+
+Error handling
+
+Specify the contents of the session token
