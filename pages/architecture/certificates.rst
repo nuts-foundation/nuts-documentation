@@ -12,12 +12,41 @@ This does not give the foundation super powers since vendors and users (both val
 .. raw:: html
     :file: ../../_static/images/certificates.svg
 
-Extensions
-**********
+Vendor CA Certificate
+*********************
 
-The vendor CA's will get a x509.v3 extension with a specific oid to indicate what kind of node it is.
-This is needed to distinguish between nodes in the medical, social, insurance or private domain. Some of these domains are not allowed to process BSN's.
-To make sure this is embedded in the security model, it's added to the certificate and must be transferred to issued certificates.
+Common Name: CN=...,O=...,C=NL
+
+=================================  ==========  =========================================
+Extension                          Critical?   Value
+=================================  ==========  =========================================
+BasicConstraints                   Yes         CA=true pathLenConstraint=1
+NameConstraints                    ???         ???
+KeyUsage                           Yes         digitalSignature & keyCertSign & crlSign
+SubjectAltName                     No          Vendor identifier: otherName, 1.3.6.1.4.1.54851.4=IA5String.<number>
+Nuts domain (1.3.6.1.4.1.54851.3)  No          IA5String=healthcare | social | pgo | insurance
+CRLDistributionPoints              No          Distribution point (URL) of the CRL
+=================================  ==========  =========================================
+
+TLS Client Certificate
+**********************
+
+Common Name: CN=...,O=...,C=NL
+
+=================================  ==========  ====================================================================
+Extension                          Critical?   Value
+=================================  ==========  ====================================================================
+BasicConstraints                   Yes         CA=false
+KeyUsage                           Yes         digitalSignature
+SubjectAltName                     No          Vendor identifier: otherName, 1.3.6.1.4.1.54851.4=IA5String.<number>
+ExtendedKeyUsage                   Yes         clientAuth
+CRLDistributionPoints              No          Distribution point (URL) of the CRL
+=================================  ==========  ====================================================================
+
+.. note::
+    The Nuts domain extension indicates what kind of node it is. This is needed to distinguish between nodes in the
+    medical, social, insurance or private domain. Some of these domains are not allowed to process Social Security Numbers (BSN).
+    To make sure this is embedded in the security model, it's added to the certificate and must be transferred to issued certificates.
 
 CN
 **
