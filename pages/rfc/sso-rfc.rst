@@ -49,12 +49,11 @@ SSO Steps
 #. The User loads a page in a patient context
 #. The source application checks rights and settings to see if this user is allows to jump (local policy)
 #. The source application checks if the patient has any external care providers with jumpable applications (Nuts registry)
-   This requires 2 calls.
+   This requires a local administration of external care providers. The Consent
+   store can not be used for this since the patients does not have to give
+   consent for a jump.
 
-   #. A call to the consent store, with the relevant Actor (care provider
-      Identifier) and Subject (patient identifier) This results in a result with
-      a list of consent records. The endpoint is described in the :ref:`nuts-consent-store-api`
-   #. For each given custodian, query the Nuts Registry for the Nuts-SSO endpoint.
+   #. For each given external care provider, query the Nuts Registry for the Nuts-SSO endpoint.
       The endpoint is described in the :ref:`nuts-registry-api`
 
 #. The source application renders a SSO button
@@ -71,7 +70,6 @@ SSO Steps
 
    #. Retrieve the session token from the access token: `rfc7662 <https://tools.ietf.org/html/rfc7662>`_ (This endpoint has yet to be implemented)
    #. Validate the identity from the session using the validate endpoint in Nuts Auth
-   #. Check if there is consent for the subject, custodian and actor
 
 #. The destination Authorization Server creates an internal URL and session and redirects the user
 #. The destination application shows the page with the client context from the session token
