@@ -1,7 +1,7 @@
 .. _nuts-documentation-sso:
 
 RFC: Single Sign On (SSO)
-###################
+#########################
 
 
 Motivation
@@ -43,26 +43,39 @@ information about the user and patient, acquires an access token from the destin
 With this token the user jumps to the destination application.
 
 
-Basic flow
-==========
+SSO Steps
+=========
 
-1. The User loads a page in a patient context
-2. The source application checks rights and settings to see if this user is allows to jump (local policy)
-3. The source application checks if the patient has any external care providers with jumpable applications (Nuts registry)
-4. The source application renders an SSO button
-5. The User clicks the button
-6. The source application collects the users identity using a login contract. If not already present, it lets the user sign one using IRMA
-7. The source application requests a session token providing user identity, patient BSN, Care Provider AGB
-8. The source application looks up the care providers vendor jump URL in the Nuts registry
-9. The source application redirects the user to the jump url with the session token in the URL
-10. The destination Authorization Server checks the session token by sending it to its local Nuts Node, gets the session, checks it, invalidates it
-11. The destination Authorization Server creates an internal URL and session and redirects the user
-12. The destination application shows the page with the client context from the session token
+#. The User loads a page in a patient context
+#. The source application checks rights and settings to see if this user is allows to jump (local policy)
+#. The source application checks if the patient has any external care providers with jumpable applications (Nuts registry)
+   This requires 2 calls.
 
-Obtain session token
-====================
+   #. A call to the consent store, with the relevant Actor (care provider
+      Identifier) and Subject (patient identifier) This results in a result with
+      a list of consent records. The endpoint is described in the :ref:`nuts-consent-store-api`
+   #. For each given custodian, query the Nuts Registry for the Nuts-SSO endpoint.
+      The endpoint is described in the :ref:`nuts-registry-api`
 
-As described in :ref:`nuts-documentation-session-tokens`
+#. The source application renders a SSO button
+#. The User clicks the button
+#. The source application collects the users identity using a login contract. If not already present, it lets the user sign one using IRMA
+   To create an IRMA session, make a call to the Nuts Auth server as described in the :ref:`nuts-consent-auth-api`
+
+#. The source application requests a session token providing user identity, patient BSN, Care Provider AGB.
+   This is described in the :ref:`nuts-documentation-session-tokens`
+
+#. The source application redirects the user to the jump url with the session token in the URL
+   The jump URL was retrieved in a previous step from the registry.
+#. The destination Authorization Server performs all the checks:
+
+   #. Retrieve the session token from the access token: `rfc7662 <https://tools.ietf.org/html/rfc7662>`_ (This endpoint has yet to be implemented)
+   #. Validate the identity from the session using the validate endpoint in Nuts Auth
+   #. Check if there is consent for the subject, custodian and actor
+
+#. The destination Authorization Server creates an internal URL and session and redirects the user
+#. The destination application shows the page with the client context from the session token
+
 
 Endpoints
 =========
