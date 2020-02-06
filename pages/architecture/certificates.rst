@@ -12,41 +12,81 @@ This does not give the foundation super powers since vendors and users (both val
 .. raw:: html
     :file: ../../_static/images/certificates.svg
 
-Vendor CA Certificate
-*********************
+If certificates are issued for any other environment than production, it is indicated in the common name. If the
+certificate is issued for the production environment, the environment part is omitted.
 
-Common Name: CN=...,O=...,C=NL
+Vendor CA Certificate
+=====================
+
+The Vendor CA Certificate contains the 'Nuts domain' extension, indicating domain the vendor operates in. It also
+contains a subject alternative name containing the vendor ID (1.3.6.1.4.1.54851.4) corresponding with the vendor's
+ID in the registry.
+
+.. note::
+    The Nuts domain extension indicates what kind of node it is. It can be medical, social, insurance or private.
+    Some of these domains are not allowed to process Social Security Numbers (BSN).
 
 =================================  ==========  =========================================
 Extension                          Critical?   Value
 =================================  ==========  =========================================
+Subject                                        CN=<Vendor> CA <Environment>,O=<Vendor>,C=NL
 BasicConstraints                   Yes         CA=true pathLenConstraint=1
-NameConstraints                    ???         ???
 KeyUsage                           Yes         digitalSignature & keyCertSign & crlSign
-SubjectAltName                     No          Vendor identifier: otherName, 1.3.6.1.4.1.54851.4=IA5String.<number>
-Nuts domain (1.3.6.1.4.1.54851.3)  No          IA5String=healthcare | social | pgo | insurance
+SubjectAltName                     No          Vendor identifier, otherName: 1.3.6.1.4.1.54851.4=UTF8String.<number>
+CRLDistributionPoints              No          Distribution point (URL) of the CRL
+Nuts domain (1.3.6.1.4.1.54851.3)  No          UTF8String=healthcare | social | pgo | insurance
+=================================  ==========  =========================================
+
+TLS Certificates
+================
+
+TLS certificates are issued by the vendor itself and are used to validate incoming requests. The implementation details
+are therefore a recommendation, since non-compliance imposes a risk limited to the vendor's software, rather than the
+whole Nuts network. Adhering to these recommendations also helps to establish a common denominator for implementations
+across the network.
+
+Vendor TLS CA Certificate
+*************************
+
+This is a intermediate CA certificate, used to issue TLS client certificates. The certificate is issued by the Vendor CA.
+
+=================================  ==========  =========================================
+Extension / Field                  Critical?   Value
+=================================  ==========  =========================================
+Subject                                        CN=<Vendor> TLS CA <Environment>,O=<Vendor>,C=NL
+BasicConstraints                   Yes         CA=true pathLenConstraint=0
+KeyUsage                           Yes         digitalSignature & keyCertSign & crlSign
+SubjectAltName                     No          Vendor identifier, otherName: 1.3.6.1.4.1.54851.4=UTF8String.<number>
 CRLDistributionPoints              No          Distribution point (URL) of the CRL
 =================================  ==========  =========================================
 
 TLS Client Certificate
 **********************
 
-Common Name: CN=...,O=...,C=NL
+When a vendor A's software wants to retrieve data from vendor B, the TLS connection is secured with certificates 2-way:
+vendor B presents a server certificate and vendor A with a client certificate which is issued by vendor B. That way,
+vendor B can easily authenticate incoming clients by testing them against its own certificate chain.
+
+Issued certificates should contain the 'Nuts domain' extension, which can be used to determine whether vendor (A) is
+allowed to receive Social Security Numbers or that they should be masked. The 'Nuts domain' of the issued certificate
+should match that of the vendor's (A) Vendor CA Certificate.
+
+Issued certificates should also contain the vendor's (A) ID as subject alternative name.
 
 =================================  ==========  ====================================================================
-Extension                          Critical?   Value
+Extension / Field                  Critical?   Value
 =================================  ==========  ====================================================================
-BasicConstraints                   Yes         CA=false
+Subject                                        CN=<Vendor A> <Environment>,O=<Vendor A>,C=NL
 KeyUsage                           Yes         digitalSignature
-SubjectAltName                     No          Vendor identifier: otherName, 1.3.6.1.4.1.54851.4=IA5String.<number>
 ExtendedKeyUsage                   Yes         clientAuth
+SubjectAltName                     No          Vendor identifier, otherName: 1.3.6.1.4.1.54851.4=UTF8String.<number>
 CRLDistributionPoints              No          Distribution point (URL) of the CRL
+Nuts domain (1.3.6.1.4.1.54851.3)  No          UTF8String=healthcare | social | pgo | insurance
 =================================  ==========  ====================================================================
 
 .. note::
-    The Nuts domain extension indicates what kind of node it is. This is needed to distinguish between nodes in the
-    medical, social, insurance or private domain. Some of these domains are not allowed to process Social Security Numbers (BSN).
-    To make sure this is embedded in the security model, it's added to the certificate and must be transferred to issued certificates.
+    The certificate is issued by vendor B to vendor A through an out-of-band process, meaning the network does not
+    provide means to transport the certificate after issuance.
 
 CN
 **
@@ -60,3 +100,12 @@ where *nuts* is static, *[network]* must be replaced by ``development``, ``test`
 .. note::
 
     The specification of the CN might be changed to a certificate extension in the future, which will allow the CN to be freely choosen.
+
+.. note::
+
+    The HTTP over TLS specification (RFC2818_) mentions in section 3.1 that usage of Common Name is deprecated and that
+    subject alternative names should be used. This only concerns the validation of a server's identity and does not
+    imply that the use of Common Names should be avoided altogether. Therefore, we'll still use Common Names in our
+    distinguished names without specifying it as subject alternative names as long as it's not a server certificate.
+
+.. _RFC2818: https://tools.ietf.org/html/rfc2818#section-3.1
