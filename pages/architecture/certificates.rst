@@ -37,8 +37,25 @@ CRLDistributionPoints              No          Distribution point (URL) of the C
 Nuts domain (1.3.6.1.4.1.54851.3)  No          UTF8String=healthcare | social | pgo | insurance
 =================================  ==========  =========================================
 
+Organisation Certificates
+-------------------------
+
+The organisation certificate is issued by the vendor when it claims a care organisation as their client. It is used to
+sign/encrypt JWTs and as KEK for encrypted data exchange with other vendors.
+
+=================================  ==========  =========================================
+Extension                          Critical?   Value
+=================================  ==========  =========================================
+Subject                                        CN=<Organisation>,O=<Vendor>,C=NL
+KeyUsage                           Yes         digitalSignature, keyEncipherment, dataEncipherment
+SubjectAltName                     No          Organisation identifier, otherName: 2.16.840.1.113883.2.4.6.1=UTF8String.<number>
+CRLDistributionPoints              No          Distribution point (URL) of the CRL
+Nuts domain (1.3.6.1.4.1.54851.3)  No          UTF8String=healthcare | social | pgo | insurance
+=================================  ==========  =========================================
+
+
 TLS Certificates
-================
+----------------
 
 TLS certificates are issued by the vendor itself and are used to validate incoming requests. The implementation details
 are therefore a recommendation, since non-compliance imposes a risk limited to the vendor's software, rather than the
@@ -46,7 +63,7 @@ whole Nuts network. Adhering to these recommendations also helps to establish a 
 across the network.
 
 Vendor TLS CA Certificate
-*************************
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This is a intermediate CA certificate, used to issue TLS client certificates. The certificate is issued by the Vendor CA.
 
@@ -55,13 +72,13 @@ Extension / Field                  Critical?   Value
 =================================  ==========  =========================================
 Subject                                        CN=<Vendor> TLS CA <Environment>,O=<Vendor>,C=NL
 BasicConstraints                   Yes         CA=true pathLenConstraint=0
-KeyUsage                           Yes         digitalSignature & keyCertSign & crlSign
+KeyUsage                           Yes         digitalSignature, keyCertSign, crlSign
 SubjectAltName                     No          Vendor identifier, otherName: 1.3.6.1.4.1.54851.4=UTF8String.<number>
 CRLDistributionPoints              No          Distribution point (URL) of the CRL
 =================================  ==========  =========================================
 
 TLS Client Certificate
-**********************
+^^^^^^^^^^^^^^^^^^^^^^
 
 When a vendor A's software wants to retrieve data from vendor B, the TLS connection is secured with certificates 2-way:
 vendor B presents a server certificate and vendor A with a client certificate which is issued by vendor B. That way,
