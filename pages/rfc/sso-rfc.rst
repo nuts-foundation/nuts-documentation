@@ -155,3 +155,5 @@ Do we need a separate Jump contract?
 Error handling
 
 Specify the contents of the session token
+
+The access token should be opaque to the source application. In a stateless token (the current implementation of the Nuts node) the token is a JWT containing the BSN of the subject. The token should be encrypted. This is currently not the case. This is fine for DEMO purposes, but should be fixed for production. Since the token is used in a GET request, it can be recorded by the browser and the server logs.
