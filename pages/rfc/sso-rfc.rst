@@ -137,7 +137,7 @@ The an registry endpoint should use the following identifier:
 Jump
 ====
 
-The user gets a status 303 or 303 with the jump sso url including the session token.
+The user gets a status 302 or 303 with the jump sso url including the session token.
 
 .. code-block:: http
 
