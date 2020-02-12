@@ -6,6 +6,36 @@ Release notes
 Whats has been changed, and how to update between versions.
 
 *******
+v0.12.0
+*******
+
+See `github project <https://github.com/orgs/nuts-foundation/projects/7>`_ for more details
+
+=======================
+Features / improvements
+=======================
+
+- Added status endpoint for consent-bridge available under /status
+- Added status endpoint for service executable available under /status
+- Added diagnostics endpoint for consent-bridge available under /status/diagnostics giving information about the service health. Things like connection status, disk status etc.
+- Added diagnostics endpoint for service executable available under /status/diagnostics giving information about the service health. Things like connection status, disk status etc.
+- Added docs about service monitoring
+- JWK's are now internally used for key representation
+- Added Ping flow to Corda to check if nodes can contact each other. Available via diagnostics
+- Corda contract now also checks if old consent records are re-offered
+- When creating a session, the existence of the given legal entity is checked
+- The registry files have changed from state-based to event-based.
+
+========
+Bugfixes
+========
+
+- The public key JWT check was broken (nuts-foundation/nuts-auth#29)
+- The return value for the consent check was wrong (nuts-foundation/nuts-consent-store#30)
+- Path variables in http service are now decoded correctly (nuts-foundation/nuts-go-core#7)
+- Fix for consent query when no validTo was given (nuts-foundation/nuts-consent-store#31)
+
+*******
 v0.11.2
 *******
 
