@@ -153,12 +153,12 @@ SSO Steps
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authentication-server'
+     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server'
 
      [
          {
              "URL": "https://nuts.custodian.test",
-             "endpointType": "urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authentication-server",
+             "endpointType": "urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server",
              "identifier": "63dda892-7d4d-4059-b3be-b73c9136e385",
              "status": "active",
              "version": "0.1.0"
@@ -209,7 +209,7 @@ Endpoints
 The an registry endpoint should use the following for the Nuts OAuth authorization server
 ::
 
-  urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authentication-server
+  urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server
 
 And the following type for the nuts SSO jump endpoint
 ::
