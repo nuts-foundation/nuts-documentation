@@ -96,11 +96,11 @@ SSO Steps
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint'
+     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint'
 
        [{
           "URL": "http://sso.nootenboom.local",
-          "endpointType": "urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint",
+          "endpointType": "urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint",
           "identifier": "a5c4afba-1393-48dc-b506-e0b6cc969094",
           "status": "active",
           "version": "0.1.0"
@@ -153,12 +153,12 @@ SSO Steps
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server'
+     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server'
 
      [
          {
              "URL": "https://nuts.custodian.test",
-             "endpointType": "urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server",
+             "endpointType": "urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server",
              "identifier": "63dda892-7d4d-4059-b3be-b73c9136e385",
              "status": "active",
              "version": "0.1.0"
@@ -177,11 +177,11 @@ SSO Steps
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint'
+     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint'
 
      [{
           "URL": "http://sso.nootenboom.local",
-          "endpointType": "urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint",
+          "endpointType": "urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint",
           "identifier": "a5c4afba-1393-48dc-b506-e0b6cc969094",
           "status": "active",
           "version": "0.1.0"
@@ -209,12 +209,12 @@ Endpoints
 The an registry endpoint should use the following for the Nuts OAuth authorization server
 ::
 
-  urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server
+  urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server
 
 And the following type for the nuts SSO jump endpoint
 ::
 
-  urn:ietf:rfc:3986:urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint
+  urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint
 
 TODO
 ****
