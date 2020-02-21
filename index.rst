@@ -14,6 +14,7 @@ Nuts documentation
     pages/technical/index.rst
     pages/development/index.rst
     pages/installation/index.rst
+    pages/administration/index.rst
     pages/configuration/index.rst
     pages/monitoring/index.rst
     pages/migration/index.rst
