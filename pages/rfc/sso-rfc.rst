@@ -173,7 +173,7 @@ Let's look at this step by step:
            "version": "0.1.0"
         }]
 
-     $ curl --location --request POST '127.0.0.1:1323/auth/accesstoken' \
+     $ curl --location --request POST 'https://nuts.custodian.test/auth/accesstoken' \
        --header 'Content-Type: application/x-www-form-urlencoded' \
        --header 'X-Nuts-LegalEntity: Demo EHR' \
        --data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer' \
