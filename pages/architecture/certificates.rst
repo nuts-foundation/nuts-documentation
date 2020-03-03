@@ -18,9 +18,17 @@ certificate is issued for the production environment, the environment part is om
 Vendor CA Certificate
 =====================
 
-The Vendor CA Certificate contains the 'Nuts domain' extension, indicating domain the vendor operates in. It also
+The Vendor CA Certificate is the vendor's root certificate which is only used to issue its intermediate CA certificate.
+The key should be kept offline.
+
+The certificate contains the 'Nuts domain' extension, indicating domain the vendor operates in. It also
 contains a subject alternative name containing the vendor ID (1.3.6.1.4.1.54851.4) corresponding with the vendor's
 ID in the registry.
+
+Vendor CA Intermediate Certificate
+==================================
+
+The Vendor CA Intermediate certificate is used by the vendor on a day-to-day basis to issue certificates.
 
 .. note::
     The Nuts domain extension indicates what kind of node it is. It can be medical, social, insurance or private.
@@ -35,6 +43,22 @@ KeyUsage                           Yes         digitalSignature & keyCertSign & 
 SubjectAltName                     No          Vendor identifier, otherName: 1.3.6.1.4.1.54851.4=UTF8String.<number>
 CRLDistributionPoints              No          Distribution point (URL) of the CRL
 Nuts domain (1.3.6.1.4.1.54851.3)  No          UTF8String=healthcare | social | pgo | insurance
+=================================  ==========  =========================================
+
+Vendor Certificate
+------------------
+
+This certificate is issued by the vendor to itself to sign events. It's validity period should be as short as possible,
+just long enough to allow the event to be timestamped and signed. In any case the validity period should not be longer
+than 1 minute (60 seconds).
+
+=================================  ==========  =========================================
+Extension                          Critical?   Value
+=================================  ==========  =========================================
+Subject                                        CN=<Vendor> <Environment>,O=<Vendor>,C=NL
+KeyUsage                           Yes         digitalSignature
+SubjectAltName                     No          Vendor identifier, otherName: 1.3.6.1.4.1.54851.4=UTF8String.<number>
+CRLDistributionPoints              No          Distribution point (URL) of the CRL
 =================================  ==========  =========================================
 
 Organisation Certificates
