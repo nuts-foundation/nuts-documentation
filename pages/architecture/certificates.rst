@@ -48,9 +48,10 @@ Nuts domain (1.3.6.1.4.1.54851.3)  No          UTF8String=healthcare | social | 
 Vendor Certificate
 ------------------
 
-This certificate is issued by the vendor to itself to sign events. It's validity period should be as short as possible,
-just long enough to allow the event to be timestamped and signed. In any case the validity period should not be longer
-than 1 minute (60 seconds).
+This certificate is issued by the vendor to itself to sign events. The key pair and certificate are ephemeral,
+ meaning they're valid just long enough to span the moment of signing. In any case the validity period should not be longer
+than 1 minute (60 seconds). The advantage of this is that the CA doesn't need to care about maintaining a CRL for these
+certificates, since if the private key leaks, the validity period of the corresponding certificate is too short to be useful for exploits.
 
 =================================  ==========  =========================================
 Extension                          Critical?   Value
