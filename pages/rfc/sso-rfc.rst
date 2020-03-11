@@ -304,7 +304,7 @@ Setup the consent:
 
 Make a SSO jump
 
-* Open http://localhost:81 (EHR of Verpleeghuis De Nootjes)
+* Open http://localhost:80 (EHR of Verpleeghuis De Nootjes)
 * login with irma
 * Navigate to Luuk
 * Open the Network tab
