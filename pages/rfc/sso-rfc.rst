@@ -106,15 +106,17 @@ Let's look at this step by step:
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint'
+     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:oid:1.3.6.1.4.1.54851.1:nuts-sso&strict=true'
 
-       [{
-          "URL": "http://sso.nootenboom.local",
-          "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint",
-          "identifier": "a5c4afba-1393-48dc-b506-e0b6cc969094",
-          "status": "active",
-          "version": "0.1.0"
-        }]
+      [{
+        "URL": "http://sso.nootenboom.local",
+        "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso",
+        "identifier": "7b8f7852-d218-4242-8406-39cf6abcde58",
+        "properties": {
+            "authorizationServerURL": "https://nuts.custodian.test"
+        },
+        "status": "active"
+      }]
 
 #. The client application renders a SSO button
 #. The User clicks the button
@@ -163,16 +165,6 @@ Let's look at this step by step:
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server'
-
-       [{
-           "URL": "https://nuts.custodian.test",
-           "endpointType": "urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server",
-           "identifier": "63dda892-7d4d-4059-b3be-b73c9136e385",
-           "status": "active",
-           "version": "0.1.0"
-        }]
-
      $ curl --location --request POST 'https://nuts.custodian.test/auth/accesstoken' \
        --header 'Content-Type: application/x-www-form-urlencoded' \
        --header 'X-Nuts-LegalEntity: Demo EHR' \
@@ -186,21 +178,6 @@ Let's look at this step by step:
        }
 
 #. The client application redirects the user to the jump url with the access token in the URL
-   First retrieve the jump URL:
-
-   .. code-block:: console
-
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint'
-
-     [{
-          "URL": "http://sso.nootenboom.local",
-          "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint",
-          "identifier": "a5c4afba-1393-48dc-b506-e0b6cc969094",
-          "status": "active",
-          "version": "0.1.0"
-      }]
-
-   And then redirect the user:
 
    .. code-block:: http
 
@@ -251,6 +228,97 @@ And the following type for the nuts SSO jump endpoint
 ::
 
   urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint
+
+Setup a development network
+***************************
+
+.. note::
+
+  This is all tested on a mac, windows machines should use the linux bash shell.
+  Let us now if you run into problems.
+
+Background
+==========
+
+We will start up 2 nuts nodes with 3 care organizations.
+We will register a consent for patient Luuk from the general practitioner (Huisartsenpraktijk Nootenboom)
+to the long term care organization (Verpleeghuis De Nootjes).
+Now, people from Verpleeghuis De Nootjes can SSO to the EHR of the general practitioner.
+
+What you'll need
+================
+
+The irma app installed on your phone
+https://irma.app/
+
+retrieve (demo) credentials
+https://privacybydesign.foundation/attribute-index/en/irma-demo.gemeente.personalData.html
+demo municipality: first name, last name full name, initials, prefix
+email: https://privacybydesign.foundation/uitgifte/email/
+
+A (free) ngrok account to open ports
+https://ngrok.com
+
+A fairly recent docker and docker-compse version
+(Make sure your docker has enough memory >6gb)
+
+Getting started
+===============
+
+Clone the nuts-network-local repo:
+https://github.com/nuts-foundation/nuts-network-local
+And use the sso branch
+
+Setup the corda nodes:
+
+.. code-block:: console
+
+  $ ./bootstrap_corda.sh
+
+Generate all network events and keys/certificates
+
+.. code-block:: console
+
+  $ ./setup-network-registry.sh
+
+.. note::
+
+  errors with `context deadline exceeded` can be ignored
+
+Start the whole network:
+
+.. code-block:: console
+
+  $ ./start-network.sh
+
+Setup the consent:
+
+* Navigate to the EHR of Huisartsenpraktijk Nootenboom
+  Open http://localhost:81
+* Login with irma
+* Navigate to patient Luuk
+* Add consent for organisation Verpleeghuis De Nootjes.
+  Wait for a while.
+  Now, Verpleeghuis De Nootjes may access the medical information.
+* Logout
+
+Make a SSO jump
+
+* Open http://localhost:81 (EHR of Verpleeghuis De Nootjes)
+* login with irma
+* Navigate to Luuk
+* Open the Network tab
+* Click on the SSO link
+* Verify you are back in the EHR of Huisartsenpraktijk Nootenboom in the context of patient Luuk
+
+.. note::
+
+  Since the consent now has been registered, next time you can start up the network
+  without Corda nodes by running ./start-network.sh ehr
+
+We use several scripts to automate the process. You can find the manual steps here:
+https://nuts-documentation.readthedocs.io/en/latest/pages/getting_started/local_network.html#setup-a-local-nuts-network
+
 
 TODO
 ****
