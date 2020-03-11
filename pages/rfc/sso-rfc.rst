@@ -227,7 +227,7 @@ The an registry endpoint should use the following for the Nuts OAuth authorizati
 And the following type for the nuts SSO jump endpoint
 ::
 
-  urn:oid:1.3.6.1.4.1.54851.1:nuts-sso-jump-endpoint
+  urn:oid:1.3.6.1.4.1.54851.1:nuts-sso
 
 Setup a development network
 ***************************
