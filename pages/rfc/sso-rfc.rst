@@ -262,12 +262,15 @@ What you'll need
 The irma app installed on your phone
 https://irma.app/
 
-retrieve (demo) credentials
-https://privacybydesign.foundation/attribute-index/en/irma-demo.gemeente.personalData.html
-demo municipality: first name, last name full name, initials, prefix
-email: https://privacybydesign.foundation/uitgifte/email/
+Several IRMA (demo) credentials loaded in the IRMA App
 
-A (free) ngrok account to open ports
+From the demo municipality: first name, last name full name, initials, prefix
+https://privacybydesign.foundation/attribute-index/en/irma-demo.gemeente.personalData.html
+
+An real email attribute
+https://privacybydesign.foundation/uitgifte/email/
+
+A (free) ngrok account to allow incoming request from the IRMA app to your local machine
 https://ngrok.com
 
 A fairly recent docker and docker-compse version
