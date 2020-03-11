@@ -111,8 +111,21 @@ The endpoint
 A vendor can implement this flow using its own existing infrastructure or use
 a by Nuts provided minimalistic implementation.
 
-The address of the Authorization Server endpoint must be announced in the Nuts
-registry under the `urn:oid:1.3.6.1.4.1.54851.2:authorization-server` type.
+The address of the Authorization Server endpoint must be provided in the resource server's registry entry in the properties object under the key `authorizationServerURL`.
+
+A complete registry entry for an sso endpoint can look like this:
+
+::
+
+    {
+        "URL": "http://sso.custodian.local/land",
+        "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso",
+        "identifier": "7b8f7852-d218-4242-8406-39cf6abcde58",
+        "properties": {
+            "authorizationServerURL": "http://nuts.custodian.local
+        },
+        "status": "active"
+    }
 
 The JWT
 *******
