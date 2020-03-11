@@ -219,15 +219,26 @@ Let's look at this step by step:
 Endpoints
 =========
 
-The an registry endpoint should use the following for the Nuts OAuth authorization server
-::
-
-  urn:ietf:rfc:3986:oid:1.3.6.1.4.1.54851.1:nuts-oauth-authorization-server
-
-And the following type for the nuts SSO jump endpoint
+The sso registry endpoint should use the following `endpointType`
 ::
 
   urn:oid:1.3.6.1.4.1.54851.1:nuts-sso
+
+The properties object of the endpoint should contain the `authorizationServerURL`.
+This is the location of the OAuth 2.0 authorization server of this endpoint.
+A complete registry entry can look like this:
+
+::
+
+    {
+        "URL": "http://localhost:80",
+        "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso",
+        "identifier": "7b8f7852-d218-4242-8406-39cf6abcde58",
+        "properties": {
+            "authorizationServerURL": "http://bundy-nuts-service-space:1323"
+        },
+        "status": "active"
+    }
 
 Setup a development network
 ***************************
