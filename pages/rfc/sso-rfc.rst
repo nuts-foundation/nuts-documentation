@@ -287,7 +287,7 @@ Setup the corda nodes:
 
 .. code-block:: console
 
-  $ ./bootstrap_corda.sh
+  $ ./bootstrap-corda.sh
 
 Generate all network events and keys/certificates
 
