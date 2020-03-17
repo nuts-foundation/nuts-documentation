@@ -106,7 +106,7 @@ Let's look at this step by step:
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:oid:1.3.6.1.4.1.54851.1:nuts-sso&strict=true'
+     $ curl --location --request GET 'actors.nuts-node.local/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:oid:1.3.6.1.4.1.54851.1:nuts-sso&strict=true'
 
       [{
         "URL": "http://sso.nootenboom.local",
@@ -125,7 +125,7 @@ Let's look at this step by step:
 
    .. code-block:: console
 
-     $ curl --location --request POST 'localhost:1323/auth/contract/session' \
+     $ curl --location --request POST 'actors.nuts-node.local/auth/contract/session' \
       --header 'Content-Type: application/json' \
       --data-raw '{
          "type": "BehandelaarLogin",
@@ -140,7 +140,7 @@ Let's look at this step by step:
 
    .. code-block:: console
 
-     $ curl --location --request GET 'localhost:1323/auth/contract/session/OgU0be4mkKr6bzsArJQr'
+     $ curl --location --request GET 'actors.nuts-node.local/auth/contract/session/OgU0be4mkKr6bzsArJQr'
 
      {"disclosed":[{"identifier":"irma-demo.nuts.agb.agbcode","rawvalue":"00000007","status":"PRESENT","value":{"":"00000007","en":"00000007","nl":"00000007"}}],"nuts_auth_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJudXRzIiwibnV0c19zaWduYXR1cmUiOnsiSXJtYUNvbnRyYWN0Ijp7IkBjb250ZXh0IjoiaHR0cHM6Ly9pcm1hLmFwcC9sZC9zaWduYXR1cmUvdjIiLCJjb250ZXh0IjoiQVE9PSIsImluZGljZXMiOltbeyJhdHRyIjoyLCJjcmVkIjowfV1dLCJtZXNzYWdlIjoiTkw6QmVoYW5kZWxhYXJMb2dpbjp2MSBPbmRlcmdldGVrZW5kZSBnZWVmdCB0b2VzdGVtbWluZyBhYW4gRGVtbyBFSFIgb20gbmFtZW5zIFpvcmdncm9lcCBOdXRzIGVuIG9uZGVyZ2V0ZWtlbmRlIGhldCBOdXRzIG5ldHdlcmsgdGUgYmV2cmFnZW4uIERlemUgdG9lc3RlbW1pbmcgaXMgZ2VsZGlnIHZhbiBkaW5zZGFnLCAxMSBmZWJydWFyaSAyMDIwIDA5OjQ5OjI1IHRvdCBkaW5zZGFnLCAxMSBmZWJydWFyaSAyMDIwIDEwOjQ5OjI1LiIsIm5vbmNlIjoid1l3WkRjMjlLRUJYUVU3U3hhdzlBZz09Iiwic2lnbmF0dXJlIjpbeyJBIjoiSUltZEh3QmQzMWdjcTlQM3hHUFo2NEdVYkNsRDBTRmo2eHVkdi9lRjh1MTBiQVRlVmZoUklLUVBMeGI3YXBzWmR6K0RXUlVVMEk1U2VPWnVTblpzZWtSUGc2eW9vQVBZcElSNmgzVTVMTDhzWVFKQ3c5Mk1SUGNaR0l2QW9OL2JJNS9mZUg0dCsrVWhYWHQ5WXVhdmtlcG1jTlYvZE9lK3VDVnNNSVowS2xLelRLekd2Z3ZhQUJpRDFUM2NBZU1VZzdJd3JUMVBIOStOQld0U1B0dzdaUmpSQnhPdmoycFRkT3dXT1dwS2kvVk1qcmxySDczcnQwOW1ZN2JWYmdTMEp2S001TzZlZlJuYytQSHJ6ZnVxMkMwdmNaMHpCTFIyRy9MelNsUnZ1dGx0Z3dKczhuTHVNcEZiVnVCSW5ISVl0ZHhJOStyTzU0ZmxnRk5mOFRLcGVnPT0iLCJhX2Rpc2Nsb3NlZCI6eyIxIjoiQXdBS05nQWFBQUZIMmprbFV0czVpQldTbEtMaE1qdmkiLCIyIjoiWUdCZ1lHQmdZRzg9In0sImFfcmVzcG9uc2VzIjp7IjAiOiJTMmtmWjdveEFCR3Zua1JUVWNYMkFlRmZlTjlqbUV4citlWXdkTzdxL2R6czZOZEs0NHk3SDhzUHZiWW5TeFE1VElCb1lrOGo2QXMwbitKMnZKWkI3U3Foa0ZOV2dyOGNESUU9IiwiMyI6IlJia29KbnA3cHVTM2xiQXgzVUV1aUM0NnU5aTdseFI4M3lZOEE5LzBjWU9LSnNxU1liNmh6cnpRRmpCMWlQSEdQS2lQRlArcCtwTzZmMXh2YTVZNEh0Nm1JSk5rNmRURnhrZksvN3pQVVBnPSJ9LCJjIjoib3NCQjdzYWJ3SVA1UnNUQWcrZGpJL3ZMYmFyNHE2dE1sa1huTWRsVmFrZz0iLCJlX3Jlc3BvbnNlIjoicTVuOW5QbkdkMzVQb3FocFlKa1NqUEdWOG1OL3FvMEhSVUxEWUFubkdBelVoRUYzaVhDempENW5Mc0NDNURnY0Fldjd6SEo4WGtWeG9FeFNTZEJkIiwidl9yZXNwb25zZSI6IkJjMDdjR0FvbFVzdURnMGEwKzFOaG5obXRBZFpMOElaby84bWNqVUNlanh6RGFjVEx1bEk3TEFvbytrdzRJTDJSVG40QkoxdGdkUTlEWHhPYXoxMDluVzBqUURUdEJCS2tacERVVzBMVmdYNExlR0NhVmF4N3N4VXd1aFhhT01JWlZFVmhTd25DRExncmd2RHhabEpaSDFTYjRaUHY3aUhPWlZNY0dJUjd5QjgyTGpXa3NIVi80amw4UjIxNlA4MmZmSTlmaTZ6amJrYld4M3RFN2ZoZGpxaVNGdS83UTRVSXBvODJCTVhZRHEvOENKaHBjb0d2WGg3VlVCaDdHc1RTWm9IWThDcTRpeE1ndnYyZDllbmwwZGZrTVh4aWNKTFdCZHZYV0xlYTl3c1RhR3FKa3B5TkhURE5aVGE1QW54bXEyTmZhTXhHM0JTNHJoL01sS0p4VmJKQ21LNlh3cHMzUnlqZC9MaDVLYURidFZBREdLaDUrNmdrKy84Z3hKTDRuQ0tkRTBTZW5NZkp1a09QUjYyT1A3N0RnWkxuOWxIYlM3Sk1rWURwRVNXQU9hRWNsZnVaRlU2M1VOYm5oZUhQOGVOMTZCRy92MDVyU0tINVROamxTUmY3MXRaOVZjblpybU8yR3cybzRvVDlFd3orbWx4aDhoTTZITTZvRWc2Q0ZqUWIzZGFBUzRnbTBMR2ZIRjZ2ejg9In1dLCJ0aW1lc3RhbXAiOnsiU2VydmVyVXJsIjoiaHR0cHM6Ly9rZXlzaGFyZS5wcml2YWN5YnlkZXNpZ24uZm91bmRhdGlvbi9hdHVtZC8iLCJTaWciOnsiQWxnIjoiZWQyNTUxOSIsIkRhdGEiOiJCdnRFOW5TMSs3dmcyVlpCQ3dQd2NsemJMbUVTUVI0WFA2ektoQ211QUZJWlJhZGRGUGR6ODFUejZaajZTQUhjUmk1N3JRNlYzSmc5b3djeE43RUFCUT09IiwiUHVibGljS2V5IjoiTUtkWHhKeEVXUFJJd05QN1N1dlAwSi9NL05WNTFWWnZxQ3lPKzdlRHdKOD0ifSwiVGltZSI6MTU4MTQxMDk4NX19fSwic3ViIjoidXJuOm9pZDoyLjE2Ljg0MC4xLjExMzg4My4yLjQuNi4xOjAwMDAwMDAwIn0.Sj7KqJDSYSD6Wjl48B-guNQoJNwpi-I9oy7JD4fhyUvYfvapLr2tCyxg5auY48h9Iwz3j2E71kQ242Nj7VgINqC94aUFpBBp79v9aDC3p-Sbr3RCZ2aiXGAmxhN8xerR0ETedhAeNZxFNLjkBlXhDxNHcDji11B_5mkQjTmymg_30x1CGQlJfXa_l31TPoSrPWGVxu3wWYKThTK1tpRzC_f9aTVHEvpFgqGLAgzY2BMNY7VwqXXMyRfrAAe2n8foiSA8lSVAa47CJWx0-4svWadcPBkwp1DgwxLoMKDceNy2ZY12kWYpHtwVgUdLq6Y7nv_As66ui0f06yMhTtRlEQ","proofStatus":"VALID","status":"DONE","token":"OgU0be4mkKr6bzsArJQr","type":"signing"}
 
@@ -149,7 +149,7 @@ Let's look at this step by step:
 
    .. code-block:: console
 
-     $ curl --location --request POST 'localhost:1323/auth/jwtbearertoken' \
+     $ curl --location --request POST 'actors.nuts-node.local/auth/jwtbearertoken' \
        --header 'Content-Type: application/json' \
        --data-raw '{
           "custodian": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
@@ -165,7 +165,7 @@ Let's look at this step by step:
 
    .. code-block:: console
 
-     $ curl --location --request POST 'https://nuts.custodian.test/auth/accesstoken' \
+     $ curl --location --request POST 'https://custodians.nuts-node-local/auth/accesstoken' \
        --header 'Content-Type: application/x-www-form-urlencoded' \
        --header 'X-Nuts-LegalEntity: Demo EHR' \
        --data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer' \
@@ -192,7 +192,7 @@ Let's look at this step by step:
 
       .. code-block:: console
 
-        $ curl --location --request POST 'localhost:1323/auth/token_introspection' \
+        $ curl --location --request POST 'custodians.nuts-node.local/auth/token_introspection' \
           --header 'Content-Type: application/x-www-form-urlencoded' \
           --data-urlencode 'token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc3Zh...46b2lkOjIuMTYuODQwLjEuMTEzODgzLjIuNC42LjE6MDAwMDAwMDAifQ.rtBqB5kuWXyIA_MimIyBS9OSREyf4lRb00xm8v7qPG1TYkI_PXj4p_Tz2Cp4a1vwPfQag5z77eqxcjqcOUQx9Xdm44nw8seQ-GqYLrf8czkSCGTNg7MuwmjuvSD2GCPfMqzYvLOo8PPBzmwthZNmBKUGuNB9Cst_y6y6ShVbl3tyL9ZBabpAJwptXVg5oZBG8ANObCiruR4uf3hvm_Ci3upR4xKf6U2yj55eASVEGicIdLQu-zVhKmU-1G8xLjIxD6iVqpAwH5rmcbI8nt0B-9h33rbB59xW3NY4WCJ7YvplgTlOUUUP3jE2NhMmZT_Yxq00DqRweS9pr5wAdo4k6w'
 
