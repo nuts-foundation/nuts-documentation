@@ -243,10 +243,13 @@ A complete registry entry can look like this:
 Setup a development network
 ***************************
 
-.. note::
 
-  This is all tested on a mac, windows machines should use the linux bash shell.
-  Let us now if you run into problems.
+This is all tested on MacOS and Ubuntu 19. On Windows 10 you can use the Linux bash shell. Let us now if you run into problems.
+
+To run on Linux (Ubuntu) you'll need the following prerequisites:
+
+- "jq" package: ``$ sudo apt-get install jq``
+- Rootless Docker daemon (otherwise the shell scripts will create files under *root* user rather than your own): https://docs.docker.com/engine/security/rootless/
 
 Background
 ==========
@@ -283,7 +286,7 @@ Clone the nuts-network-local repo:
 https://github.com/nuts-foundation/nuts-network-local
 And use the sso branch
 
-Setup the corda nodes:
+Setup the corda nodes (you're asked to enter 2 vendor names, you can enter any name):
 
 .. code-block:: console
 
@@ -308,18 +311,18 @@ Start the whole network:
 Setup the consent:
 
 * Navigate to the EHR of Huisartsenpraktijk Nootenboom
-  Open http://localhost:81
-* Login with irma
+  Open http://localhost:8001
+* Login with irma (if you're not redirected after login, manually navigate to '/')
 * Navigate to patient Luuk
-* Add consent for organisation Verpleeghuis De Nootjes.
-  Wait for a while.
+* Add consent for organisation Verpleeghuis De Nootjes by opening the *Network* tab and adding a share.
+  After adding the share, wait until the state 'pending acceptance' disappears.
   Now, Verpleeghuis De Nootjes may access the medical information.
 * Logout
 
 Make a SSO jump
 
-* Open http://localhost:80 (EHR of Verpleeghuis De Nootjes)
-* login with irma
+* Open http://localhost:8000 (EHR of Verpleeghuis De Nootjes)
+* Login with irma (if you're not redirected after login, manually navigate to '/')
 * Navigate to Luuk
 * Open the Network tab
 * Click on the SSO link
