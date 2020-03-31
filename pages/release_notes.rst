@@ -6,6 +6,54 @@ Release notes
 Whats has been changed, and how to update between versions.
 
 *******
+v0.13.0
+*******
+
+======================
+Upgrading from v0.12.0
+======================
+
+The registry now also contains vendors and since a node must be linked to a vendor, the `nuts.yaml` must now contain an `identity`. Checkout :ref:`nuts-go-config` for the details.
+
+See :ref:`migration` for a complete overview of all migrations.
+
+=======================
+Features / improvements
+=======================
+
+(https://github.com/nuts-foundation/nuts-XXX/issues/X)
+
+- Added chaos testing setup which runs tests while pausing different parts of the Nuts node. (https://github.com/nuts-foundation/nuts-chaos-testing)
+- Updated Corda to 4.4 (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/39)
+- Querying endpoints now also returns the organisation ID for the endpoint. (https://github.com/nuts-foundation/nuts-registry/issues/64)
+- Added OAuth2 flow using Irma contracts as zero-knowledge-proof tokens to get access token. (https://github.com/nuts-foundation/nuts-auth/issues/31)
+- Better reliability of the bridge due to better connection handling. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/46)
+- Added docker container health check for nuts-cordapp image. (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/38)
+- Added docker container health check for nuts-bridge image. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/47)
+- Added docker container health check for nuts-service-space image. (https://github.com/nuts-foundation/nuts-XXX/issues/X)
+- The starting point for Corda events is now persisted so the bridge will resume after restart. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/21)
+- Registry entries for vendor now have a signed certificate. (https://github.com/nuts-foundation/nuts-registry/issues/24)
+- Registry entries for organisation now have a signed certificate. (https://github.com/nuts-foundation/nuts-registry/issues/26)
+- Registry entries are now signed. (https://github.com/nuts-foundation/nuts-registry/issues/60)
+- Registry entries are validated and errors are shown when the certificate hierarchy is incorrect. (https://github.com/nuts-foundation/nuts-registry/issues/25)
+- Added CLI mode to the nuts executable.
+- Added *registerVendor*, *registerOrganization* and *registerEndpoint* commands tro CLI mode. (https://github.com/nuts-foundation/nuts-registry/issues/30)
+- Authorization server type endpoint has been added to the registry. (https://github.com/nuts-foundation/nuts-registry/issues/44)
+- Consent bridge now also publishes to the retry and error queue when things go wrong. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/41)
+- Added identity parameter to nuts-go config. (https://github.com/nuts-foundation/nuts-registry/issues/43)
+- Added persistence to discovery service, CSR's, signed certificates, the network config and node information now survive restarts.
+- Prepared for change in endpoint type identifier for bridge. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/39)
+
+========
+Bugfixes
+========
+
+- It wasn't possible to add a legal base for data exchange when the custodian and actor were serviced by the same node. (https://github.com/nuts-foundation/nuts-consent-logic/issues/30)
+- Disabled Corda auto-reconnect. According to Corda it is experimental and indeed it did not function well. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/38)
+
+(https://github.com/nuts-foundation/nuts-XXX/issues/X)
+
+*******
 v0.12.0
 *******
 
