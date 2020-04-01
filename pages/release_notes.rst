@@ -25,8 +25,6 @@ See :ref:`migration` for a complete overview of all migrations.
 Features / improvements
 =======================
 
-(https://github.com/nuts-foundation/nuts-XXX/issues/X)
-
 - Added chaos testing setup which runs tests while pausing different parts of the Nuts node. (https://github.com/nuts-foundation/nuts-chaos-testing)
 - Updated Corda to 4.4 (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/39)
 - Querying endpoints now also returns the organisation ID for the endpoint. (https://github.com/nuts-foundation/nuts-registry/issues/64)
@@ -34,7 +32,7 @@ Features / improvements
 - Better reliability of the bridge due to better connection handling. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/46)
 - Added docker container health check for nuts-cordapp image. (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/38)
 - Added docker container health check for nuts-bridge image. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/47)
-- Added docker container health check for nuts-service-space image. (https://github.com/nuts-foundation/nuts-XXX/issues/X)
+- Added docker container health check for nuts-service-space image. (https://github.com/nuts-foundation/nuts-go/issues/15)
 - The starting point for Corda events is now persisted so the bridge will resume after restart. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/21)
 - Registry entries for vendor now have a signed certificate. (https://github.com/nuts-foundation/nuts-registry/issues/24)
 - Registry entries for organisation now have a signed certificate. (https://github.com/nuts-foundation/nuts-registry/issues/26)
@@ -54,8 +52,6 @@ Bugfixes
 
 - It wasn't possible to add a legal base for data exchange when the custodian and actor were serviced by the same node. (https://github.com/nuts-foundation/nuts-consent-logic/issues/30)
 - Disabled Corda auto-reconnect. According to Corda it is experimental and indeed it did not function well. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/38)
-
-(https://github.com/nuts-foundation/nuts-XXX/issues/X)
 
 *******
 v0.12.0
