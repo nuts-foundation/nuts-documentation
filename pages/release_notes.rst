@@ -9,6 +9,10 @@ Whats has been changed, and how to update between versions.
 v0.13.0
 *******
 
+Focus of this relase was on robustness; automatic resumption of listeners/handlers, no more lost events or duplicate events. Developer Happiness by providing scripts to setup the nuts-local-network. Adding a Demo-EHR so nuts becomes clickable. Improving the registry by making it event based and adding signatures. Provide a convenient API authorization method by providing an easy to use OAuth 2 flow which accepts IRMA identity tokens.
+
+For specific issues also see: https://github.com/orgs/nuts-foundation/projects/8
+
 ======================
 Upgrading from v0.12.0
 ======================
