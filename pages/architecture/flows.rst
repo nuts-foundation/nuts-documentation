@@ -77,6 +77,6 @@ The later two can be checked by two API calls on the Nuts node. The return value
 :ref:`nuts-consent-store-api`, :ref:`nuts-auth-api` and how to implement it: :ref:`nuts-documentation-authenticate`.
 The two-way TLS connection will be established with vendor specific certificates coming from a CA specified in :ref:`nuts-documentation-architecture-certificates`.
 
-.. info::
+.. note::
 
     Some more references to other pages to add when they come available.
