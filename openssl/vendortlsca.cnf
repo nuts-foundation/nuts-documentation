@@ -1,0 +1,25 @@
+# X509v3 extensions to add to a certificate request see x509v3_config
+
+[ req ]
+default_bits        = 2048
+distinguished_name  = empty_distinguished_name
+x509_extensions          = ext
+
+[ empty_distinguished_name ]
+
+
+[ alt_distinguished_name ]
+O=Vendor CA
+C=NL
+
+[ ext ]
+basicConstraints=critical,CA:TRUE,pathlen:1
+nameConstraints=permitted;dirName:alt_distinguished_name
+keyUsage=nonRepudiation,digitalSignature,keyEncipherment,keyCertSign
+# extendedKeyUsage=clientAuth,serverAuth
+subjectAltName=critical,@altNames
+1.3.6.1.4.1.54851.3=ASN1:UTF8String:pg
+
+[ altNames ]
+dirName.1=alt_distinguished_name
+# otherName.1=1.3.6.1.4.1.54851.4;UTF8:12345678

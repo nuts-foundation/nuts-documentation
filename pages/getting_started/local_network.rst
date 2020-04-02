@@ -1,5 +1,11 @@
 Setup a local Nuts network
 --------------------------
+
+.. warning::
+
+  This instruction is only tested with the corresponding tagged/versioned branches and containers.
+  Master branch or any other specific use-case related versions might need their own set of instructions.
+
 Since Nuts is a distributed network, every party in the network runs its own node. A node consist of 3 parts:
 
 * The `nuts-go <https://github.com/nuts-foundation/nuts-go>`_ application which behaves as the main access point for vendors

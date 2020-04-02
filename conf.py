@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- Project information -----------------------------------------------------
 
 project = u'Nuts'
-copyright = u'2019, Nuts community'
+copyright = u'2020, Nuts community'
 author = u'Nuts community'
 
 # The short X.Y version

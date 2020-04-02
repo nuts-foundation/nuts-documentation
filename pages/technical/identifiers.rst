@@ -21,6 +21,10 @@ urn:oid:2.16.840.1.113883.2.4.6.1       AGBCode                 Consent/Registry
 urn:oid:1.3.6.1.4.1.54851               Nuts root OID                                   Root OID used for mounting point of Nuts classifiers.
 urn:oid:1.3.6.1.4.1.54851.1             Nuts consent classes    Consent                 Consent classifier ID, eg: urn:oid:1.3.6.1.4.1.54851.1:MEDICAL.
 urn:oid:1.3.6.1.4.1.54851.2             Nuts endpoint types     Registry                The type of endpoint a URL points to, eg: Consent, Registry or FHIR.
+urn:oid:1.3.6.1.4.1.54851.3             Nuts domain             Registry                Domain supported by Nuts in which a vendor/organization operates.
+                                                                                        Supported values: "healthcare", "social", "pgo" or "insurance".
+urn:oid:1.3.6.1.4.1.54851.4             Nuts vendor ID          Registry                Identifies a registered vendor. Contains the Chamber of Commerce registration
+                                                                                        number, encoded as a string.
 urn:ietf:rfc:1779                       X500Name                Registry                Name notation used in X509 Certificates. Identifies a Consent Corda node.
 urn:ietf:rfc:3986                       URI                     Consent/Registry/Auth   Indication the value is of type URI, should be used to indicate an OID
 =====================================   ====================    =====================   =============================================================================

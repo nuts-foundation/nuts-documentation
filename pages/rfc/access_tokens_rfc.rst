@@ -154,10 +154,11 @@ The issuer in the JWT is always the actor, thus the care organization doing the 
 This is used to find the public key of the issuer from the Nuts registry.
 
 .. note::
-Since the nuts token is signed with the private key of the requester, it is not
-trivial to verify the signature of the token.
-When receiving a request, any token signature verification steps must be
-postponed until it is clear a token is not a nuts token.
+
+    Since the nuts token is signed with the private key of the requester, it is not
+    trivial to verify the signature of the token.
+    When receiving a request, any token signature verification steps must be
+    postponed until it is clear a token is not a nuts token.
 
 sub
 ===
