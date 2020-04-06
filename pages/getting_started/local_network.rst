@@ -1,3 +1,5 @@
+.. _nuts-setup-local-network:
+
 Setup a local Nuts network
 --------------------------
 Since Nuts is a distributed network, every party in the network runs its own node. A node consist of 3 parts:

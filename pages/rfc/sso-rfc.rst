@@ -18,7 +18,7 @@ employer or vendor.
 Status of this RFC
 ******************
 
-This RFC is a work in progress. See the TODO_ section below. To provide comments
+This RFC being tested as a POC in the SSO-Bolt. See the TODO_ section below. To provide comments
 create an issue on the `Github repository containing this documentation
 <https://github.com/nuts-foundation/nuts-documentation/issues>`_.
 
@@ -277,36 +277,12 @@ A (free) ngrok account to allow incoming request from the IRMA app to your local
 https://ngrok.com
 
 A fairly recent docker and docker-compse version
-(Make sure your docker has enough memory >6gb)
+(Make sure your docker has enough memory > 7gb)
 
 Getting started
 ===============
 
-Clone the nuts-network-local repo:
-https://github.com/nuts-foundation/nuts-network-local
-And use the sso branch
-
-Setup the corda nodes (you're asked to enter 2 vendor names, you can enter any name):
-
-.. code-block:: console
-
-  $ ./bootstrap-corda.sh
-
-Generate all network events and keys/certificates
-
-.. code-block:: console
-
-  $ ./setup-network-registry.sh
-
-.. note::
-
-  errors with `context deadline exceeded` can be ignored
-
-Start the whole network:
-
-.. code-block:: console
-
-  $ ./start-network.sh
+Follow the steps as provided in the :ref:`nuts-setup-local-network` guide
 
 Setup the consent:
 
@@ -333,17 +309,9 @@ Make a SSO jump
   Since the consent now has been registered, next time you can start up the network
   without Corda nodes by running ./start-network.sh ehr
 
-We use several scripts to automate the process. You can find the manual steps here:
-https://nuts-documentation.readthedocs.io/en/latest/pages/getting_started/local_network.html#setup-a-local-nuts-network
 
 
 TODO
 ****
-
-Do we need a separate Jump contract?
-
--> Probably not, just provide a `nuts-sso` scope with the JWT Bearer token
-
-Error handling
 
 The access token should be opaque to the client application. In a stateless token (the current implementation of the Nuts node) the token is a JWT containing the BSN of the subject. The token should be encrypted. This is currently not the case. This is fine for DEMO purposes, but should be fixed for production. Since the token is used in a GET request, it can be recorded by the browser and the server logs.
