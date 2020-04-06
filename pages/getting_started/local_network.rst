@@ -1,11 +1,7 @@
+.. _nuts-setup-local-network:
+
 Setup a local Nuts network
 --------------------------
-
-.. warning::
-
-  This instruction is only tested with the corresponding tagged/versioned branches and containers.
-  Master branch or any other specific use-case related versions might need their own set of instructions.
-
 Since Nuts is a distributed network, every party in the network runs its own node. A node consist of 3 parts:
 
 * The `nuts-go <https://github.com/nuts-foundation/nuts-go>`_ application which behaves as the main access point for vendors
@@ -29,6 +25,8 @@ This requires Docker to be installed.
 Checkout the nuts network local repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+At the time of writing v0.13.0 is the latest version. Make sure to use a stable version corresponding to this version of the documentation.
+
 .. code-block:: console
 
    $ git clone https://github.com/nuts-foundation/nuts-network-local.git
@@ -39,6 +37,8 @@ Checkout the nuts network local repository
    remote: Total 129 (delta 62), reused 98 (delta 33), pack-reused 0
    Receiving objects: 100% (129/129), 286.29 KiB | 1.04 MiB/s, done.
    Resolving deltas: 100% (62/62), done.
+   cd nuts-network-local
+   $ git checkout tags/0.13.0
 
 Inspect the package
 ^^^^^^^^^^^^^^^^^^^
@@ -46,11 +46,14 @@ Inspect the package
 This project is mainly a ``docker-compose.yml`` file, a cordapp and node configuration files.
 
 The first node is called bundy, the second dahmer (any resemblance to serial killers is purely coincidental).
+A little trick to keep the nodes apart: they are in alphabetical ordering and so are the port numbers etc.
 
-When you inspect the `docker-compose.yml <https://github.com/nuts-foundation/nuts-network-local/blob/master/docker-compose.yml>`_ you will see two nodes with its 3 applications and a notary.
+When you inspect the `docker-compose.yml <https://github.com/nuts-foundation/nuts-network-local/blob/master/docker-compose.yml>`_
+you will see two nodes with its 3 applications and a notary.
 
 Each node has its own configuration directory in the config/node_name folder e.g. `dahmers config <https://github.com/nuts-foundation/nuts-network-local/tree/master/config/dahmer>`_.
-It contains a private key, the bridge config (`application.properties <https://github.com/nuts-foundation/nuts-network-local/blob/master/config/dahmer/application.properties>`_) and the nuts-go config (`nuts.yaml <https://github.com/nuts-foundation/nuts-network-local/blob/master/config/dahmer/nuts.yaml>`_) file.
+It contains a private key, the bridge config (`application.properties <https://github.com/nuts-foundation/nuts-network-local/blob/master/config/dahmer/application.properties>`_)
+and the nuts-go config (`nuts.yaml <https://github.com/nuts-foundation/nuts-network-local/blob/master/config/dahmer/nuts.yaml>`_) file.
 Documentation about all these configuration parameters can be found in the :ref:`Configuration section<Configuration>`
 
 The registry config is shared between nodes and contains the addresses and public keys of both nodes.
@@ -59,31 +62,35 @@ You are encouraged to inspect these files.
 Generate the corda nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-Get the Corda network bootstrapper tool from https://repo1.maven.org/maven2/net/corda/corda-tools-network-bootstrapper/4.3/
-and generate the 2 network nodes + notary:
+To create a network of trust, Corda uses a bootstrapper tool. This tool must be downloaded
+because it's to large to keep in version control. For more information about the bootstrapping process see the corda docs: https://docs.corda.net/docs/corda-os/4.4/network-bootstrapper.html
+We provided a script to download and run the tool.
 
 .. code-block:: console
 
-  $ cd nuts-network-local
-  $ cd nodes
-  $ curl -O https://repo1.maven.org/maven2/net/corda/corda-tools-network-bootstrapper/4.3/corda-tools-network-bootstrapper-4.3.jar
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                Dload  Upload   Total   Spent    Left  Speed
-  100  108M  100  108M    0     0  27.7M      0  0:00:03  0:00:03 --:--:-- 27.7M
-
-  $ docker run --mount type=bind,source="$(pwd)",target=/opt/app openjdk:8-jdk-slim java -jar /opt/app/corda-tools-network-bootstrapper-4.3.jar --dir /opt/app
+  $ ./bootstrap-corda.sh
+  Nuts network bootstrapper with Corda apps v0.13.0
+  WARNING: This script removes all existing corda nodes and generate new ones.
+  Do you want to continue? [Yes/No]Yes
+  removing all nodes (if any)
+  download new cordapps of version 0.13.0
+  downloading corda network boostrapper
+  running bootstrapper (this may take a while)
   Bootstrapping local test network in /opt/app
   Generating node directory for dahmer
   Generating node directory for bundy
   Generating node directory for notary
   Nodes found in the following sub-directories: [notary, dahmer, bundy]
-  Found the following CorDapps: [flows-0.11.0.jar, contract-0.11.0.jar]
-  Not copying CorDapp JARs as --copy-cordapps is set to FirstRunOnly, and it looks like this network has already been bootstrapped.
+  Found the following CorDapps: [flows-0.13.0.jar, contract-0.13.0.jar]
+  Copying CorDapp JARs into node directories
   Waiting for all nodes to generate their node-info files...
   ... still waiting. If this is taking longer than usual, check the node logs.
   Distributing all node-info files to all nodes
-  Loading existing network parameters... NetworkParameters {
-        minimumPlatformVersion=5
+  Loading existing network parameters... none found
+  Gathering notary identities
+  Generating contract implementations whitelist
+  New NetworkParameters {
+        minimumPlatformVersion=6
         notaries=[NotaryInfo(identity=CN=nuts_corda_development_notary, O=Nuts, L=Groenlo, C=NL, validating=false)]
         maxMessageSize=10485760
         maxTransactionSize=524288000
@@ -94,23 +101,31 @@ and generate the 2 network nodes + notary:
         packageOwnership {
 
         }
-        modifiedTime=2020-01-06T16:02:28.519Z
+        modifiedTime=2020-04-01T15:08:48.560Z
         epoch=1
     }
-  Gathering notary identities
-  Generating contract implementations whitelist
-  Network parameters unchanged
   Bootstrapping complete!
+  done
+
+Populate Nuts registry
+^^^^^^^^^^^^^^^^^^^^^^
+
+The Nuts registry contains identities of vendors and care organizations and endpoints of resource servers.
+In order to make use of the nodes the registry must be populated. For this a script is provided:
+
+.. code-block:: console
+
+  $ ./setup-network-registry.sh
+
+You are asked to enter the names of two software vendors. This makes it easier to implement a use-case.
+The script generated a lot of registry events. Take a look in config/registry/events.
 
 Starting up the nodes
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. note::
-
-  if you get the following error:
-  ``msg="Could not initialize IRMA library:" error="Error parsing scheme manager irma-demo: Could not read scheme manager timestamp: <nil>"``
-  This happens sometimes during first boot since the irma schema is shared between nodes and one of the nodes is downloading it, the other can't access it.
-  If this is the case, simply stop the stack and start it again.
+The Nuts node needs to accept some incoming connections from the IRMA app. To make this easier, we
+provided a script that boots up ngrok and puts the endpoints in the nuts config.
+The script will ask for a ngrok token during first boot. For this you will need a free ngrok account. Get your token at https://dashboard.ngrok.com/auth.
 
 .. note::
 
@@ -118,18 +133,30 @@ Starting up the nodes
 
 .. code-block:: console
 
-  $ docker-compose up -V
-
-
-.. raw:: html
-
-  <script id="asciicast-GXiWcMMk8nAgPwKHdfswtkGC8" src="https://asciinema.org/a/GXiWcMMk8nAgPwKHdfswtkGC8.js" data-speed="1.7" data-idle-time-limit="0.15" async></script>
-
+  $ ./start-network.sh
 
 Congratulations!! You just booted a full Nuts network on your local machine :)
 
-Record your first consent
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Demo EHR
+^^^^^^^^
+
+To make interacting with Nuts a bit more fun we added a Demo EHR. There are 3 care organizations available on the addresses:
+
++---------------------------------+------------------------------+--------------------------+
+| Care provider name              | Address                      | Corda Node               |
++=================================+==============================+==========================+
+| Verpleeghuis de Nootjes         | http://localhost:8000        | Bundy                    |
++---------------------------------+------------------------------+--------------------------+
+| Huisartsenpraktijk Nootenboom   | http://localhost:8001        | Dahmer                   |
++---------------------------------+------------------------------+--------------------------+
+| Medisch Centrum Noot aan de Man | http://localhost:8002        | Dahmer                   |
++---------------------------------+------------------------------+--------------------------+
+
+To register a consent, choose a patient who is know by both organizations. Luuk Meijer is such a patient who is known to Verpleeghuis de Nootjes and known to Huisartsenpraktijk Nootenboom.
+Go to the patient, click in the network tab and Add a consent. This should take less than a minute. You can see the progress by going to the patients list and scroll down tot the Transactions section.
+
+Record your first consent using the API
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To see if everything is set up correctly, we will create a consent request by posting to the consent-logic api.
 More details about the api and its endpoints can be found :ref:`here<Nuts consent logic API>`

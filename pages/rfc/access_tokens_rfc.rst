@@ -1,12 +1,12 @@
-.. _nuts-documentation-session-tokens:
+.. _nuts-documentation-access-tokens:
 
-RFC: Session Tokens
+RFC: Access Tokens
 ###################
 
-Session tokens are tokens which should be provided along an API request which refer
-to contextual information of the request.
-A session is scoped to an actor, subject and custodian. Optionally a reference
-to a specific consent record can be provided.
+Access tokens are short lived opaque tokens which accommodate an API request and
+refer to contextual information of the request.
+Such an API request is scoped by the token to an actor, subject and custodian.
+Optionally a reference to a specific consent record can be provided.
 
 Status of this RFC
 ******************
@@ -58,7 +58,7 @@ of these requests.
 Limitations
 ***********
 
-Because it is necessary to request a new session for every combination of subject
+Because it is necessary to request a new access token for every combination of subject
 custodian and actor, bulk operations, like getting reports for many patients
 at once, is not possible. We could consider allowing list of subjects during the
 token requests.
@@ -66,16 +66,18 @@ token requests.
 Mechanics
 *********
 
-To resolve above issues, we'll introduce *sessions*. A session lives on the
-custodian side and contains information about the subject, actor and custodian.
-Additional information can be stored like, session expiration and consent reference.
+To resolve above issues, we'll introduce *access tokens*. Access tokens refer to
+a context of the current request. This information can be embedded in an encrypted
+access token or can be stored on the authorization server. This information contains
+of the subject, actor and custodian.
+Additional information can be stored like, token expiration and consent reference.
 
 To **obtain the users identity**, the users follows a standard Login flow presenting
 its attributes using IRMA, signing the LoginContract. The signed contract can
 be stored by the users XIS in a session for the validity of the contract.
 
-Once the user wants to request data about a subject, a **session token must be obtained**.
-The session token can be acquired using an OAuth 2.0 flow with the
+Once the user wants to request data about a subject, a **access token must be obtained**.
+The access token can be acquired using an OAuth 2.0 flow with the
 `urn:ietf:params:oauth:grant-type:jwt-bearer` grant_type. This profile is
 described in `RFC7523 <https://tools.ietf.org/html/rfc7523>`_.
 
@@ -83,21 +85,21 @@ For Actor identification the requests will be performed over a mutual SSL connec
 The client will use a certificate signed by the CA of the custodian.
 This will be described in another RFC.
 
-As the rfc7523 describes, a JWT should be build and posted to the Authorization Server
-(Nuts node or own implementation). The Authorization Server checks all requirements
-like a valid consent, validity of the session token, match of clientID and Actor etc.
-If everything is valid, it creates a session and the session token which should
-be returned.
+As the rfc7523 describes, a JWT Bearer token should be build and posted to the
+Authorization Server (Nuts node or own implementation). The Authorization Server
+checks all requirements like a valid consent, validity of the access token,
+match of clientID and Actor etc. If everything is valid, it creates and returns
+the access token.
 
 The client can now perform API requests using the same mutual SSL connection
-providing the session token along with the request.
+providing the access token along with the request.
 For example, in the case of a HTTP REST call in the form of a bearer token in the
 Authorization Header. Contrary to the
 `original OAuth 2 definition <https://tools.ietf.org/html/rfc6750#section-1.2>`_
 of a Bearer token, the token is bound to the client by its two way (mutual) SSL
 certificate.
 
-The XIS receiving the session token can retrieve the session by
+The XIS receiving the access token can retrieve the context by
 `token introspection <https://tools.ietf.org/html/rfc7662>`_.
 
 .. raw:: html
@@ -109,8 +111,21 @@ The endpoint
 A vendor can implement this flow using its own existing infrastructure or use
 a by Nuts provided minimalistic implementation.
 
-The address of the Authorization Server endpoint must be announced in the Nuts
-registry under the `urn:oid:1.3.6.1.4.1.54851.2:authorization-server` type.
+The address of the Authorization Server endpoint must be provided in the resource server's registry entry in the properties object under the key `authorizationServerURL`.
+
+A complete registry entry for an sso endpoint can look like this:
+
+::
+
+    {
+        "URL": "http://sso.custodian.local/land",
+        "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso",
+        "identifier": "7b8f7852-d218-4242-8406-39cf6abcde58",
+        "properties": {
+            "authorizationServerURL": "http://nuts.custodian.local
+        },
+        "status": "active"
+    }
 
 The JWT
 *******

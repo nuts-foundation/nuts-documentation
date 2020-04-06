@@ -1,0 +1,317 @@
+.. _nuts-documentation-sso:
+
+RFC: Single Sign On (SSO)
+#########################
+
+
+Motivation
+**********
+
+Care professionals sometimes work with the same patients for several care
+organizations using different software vendors. Their daily work can greatly be
+improved when they can switch effortless between these applications without providing
+new credentials on every switch.
+Therefor we propose a way of Single-Sign-On (SSO) for sharing a universal
+identity among different software applications, not necessary from the same
+employer or vendor.
+
+Status of this RFC
+******************
+
+This RFC being tested as a POC in the SSO-Bolt. See the TODO_ section below. To provide comments
+create an issue on the `Github repository containing this documentation
+<https://github.com/nuts-foundation/nuts-documentation/issues>`_.
+
+Limitations
+***********
+
+A party who wants to verify the identity of the user must run a Nuts Node.
+
+The application the user jumps to can only show the patient from the provided context.
+
+The application the user jumps to does not get notified about logout operations
+from the original application. Sessions should end after closing the browser window/tab.
+
+Terminology
+***********
+
+The following terminology is based on the OAuth 2 specification.
+
+Client Application
+==================
+The application the users starts the jump from.
+
+Resource server
+===============
+
+The application (a protected resource) the user is trying to jump to.
+
+JWT Bearer Token
+================
+
+JWT encoded Bearer token contains the user's identity, subject and custodian and
+is signed by the acting party. This token is used to obtain an OAuth 2 access token.
+
+Access Token
+============
+
+An OAuth 2 Access Token, provided by an Authorization Server. This token is handed
+to the client so it can authorize itself to a resource server. The contents of
+the token is opaque to the client. This means that the client does not need to
+know anything about the content or structure of the token itself.
+
+The resource server can exchange the Access Token at its own Authorization Server
+for a JSON document containing all the needed attributes.
+
+Authorization server
+====================
+
+The Authorization server checks the user's identity and credentials and creates the
+access token which should be used during the jump. The authorization server is
+trusted by the resource server. The resource server can exchange the access token
+for a JSON document with the user's identity, subject, custodian, validity and scopes.
+This mechanism called token introspection and is is described in `rfc7662 <https://tools.ietf.org/html/rfc7662>`_
+
+Request Context
+===============
+
+The context of a request identified by the access token. The access token refers
+to this context. The context consists of the Custodian, Actor, patient and scope
+of the request like, in this case, a SSO. A context can be retrieved by performing
+token inspection.
+
+Mechanics
+*********
+
+This document builds on Login Contracts and the RFC on Session Tokens.
+
+We have two applications: The client application, and the resource server.
+Both run their own Nuts Node (could be the same node). The client application collects
+information about the user and patient, acquires an access token by posting a
+JWT Bearer Token to the authorization server (this can be the Nuts node or a
+custom implementation).
+With this access token the user jumps to the resource server. The resource server
+retrieves the request context by a method called token introspection.
+
+SSO Steps
+=========
+
+Let's look at this step by step:
+
+#. The User loads a page in the client application in the context of a certain subject (patient).
+#. The client application checks rights and settings to see if this user is allows to jump (local policy)
+#. The client application checks if the subject has any external custodians (care providers). This subject <-> custodian relationship should be registered locally.
+#. For each custodian the client application checks if it has a jump endpoint
+   The endpoint is described in the :ref:`nuts-registry-api`
+
+   .. code-block:: console
+
+     $ curl --location --request GET 'actors.nuts-node.local/api/endpoints?orgIds=urn:oid:2.16.840.1.113883.2.4.6.1:00000001&type=urn:oid:1.3.6.1.4.1.54851.1:nuts-sso&strict=true'
+
+      [{
+        "URL": "http://sso.nootenboom.local",
+        "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso",
+        "identifier": "7b8f7852-d218-4242-8406-39cf6abcde58",
+        "properties": {
+            "authorizationServerURL": "https://nuts.custodian.test"
+        },
+        "status": "active"
+      }]
+
+#. The client application renders a SSO button
+#. The User clicks the button
+#. The client application collects the users identity using a login contract. If not already present, it lets the user sign one using IRMA
+   To create an IRMA session, make a call to the Nuts Auth server as described in the :ref:`nuts-consent-auth-api`
+
+   .. code-block:: console
+
+     $ curl --location --request POST 'actors.nuts-node.local/auth/contract/session' \
+      --header 'Content-Type: application/json' \
+      --data-raw '{
+         "type": "BehandelaarLogin",
+         "language": "NL",
+         "version": "v1",
+         "legalEntity": "Zorggroep Nuts"
+      }'
+
+      {"qr_code_info":{"irmaqr":"signing","u":"https://yourdomain.test/auth/irmaclient/session/L6onpBhXyzHnE5bVkipH"},"session_id":"OgU0be4mkKr6bzsArJQr"}
+
+   After the user signs the contract, retrieve the Identity Token:
+
+   .. code-block:: console
+
+     $ curl --location --request GET 'actors.nuts-node.local/auth/contract/session/OgU0be4mkKr6bzsArJQr'
+
+     {"disclosed":[{"identifier":"irma-demo.nuts.agb.agbcode","rawvalue":"00000007","status":"PRESENT","value":{"":"00000007","en":"00000007","nl":"00000007"}}],"nuts_auth_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJudXRzIiwibnV0c19zaWduYXR1cmUiOnsiSXJtYUNvbnRyYWN0Ijp7IkBjb250ZXh0IjoiaHR0cHM6Ly9pcm1hLmFwcC9sZC9zaWduYXR1cmUvdjIiLCJjb250ZXh0IjoiQVE9PSIsImluZGljZXMiOltbeyJhdHRyIjoyLCJjcmVkIjowfV1dLCJtZXNzYWdlIjoiTkw6QmVoYW5kZWxhYXJMb2dpbjp2MSBPbmRlcmdldGVrZW5kZSBnZWVmdCB0b2VzdGVtbWluZyBhYW4gRGVtbyBFSFIgb20gbmFtZW5zIFpvcmdncm9lcCBOdXRzIGVuIG9uZGVyZ2V0ZWtlbmRlIGhldCBOdXRzIG5ldHdlcmsgdGUgYmV2cmFnZW4uIERlemUgdG9lc3RlbW1pbmcgaXMgZ2VsZGlnIHZhbiBkaW5zZGFnLCAxMSBmZWJydWFyaSAyMDIwIDA5OjQ5OjI1IHRvdCBkaW5zZGFnLCAxMSBmZWJydWFyaSAyMDIwIDEwOjQ5OjI1LiIsIm5vbmNlIjoid1l3WkRjMjlLRUJYUVU3U3hhdzlBZz09Iiwic2lnbmF0dXJlIjpbeyJBIjoiSUltZEh3QmQzMWdjcTlQM3hHUFo2NEdVYkNsRDBTRmo2eHVkdi9lRjh1MTBiQVRlVmZoUklLUVBMeGI3YXBzWmR6K0RXUlVVMEk1U2VPWnVTblpzZWtSUGc2eW9vQVBZcElSNmgzVTVMTDhzWVFKQ3c5Mk1SUGNaR0l2QW9OL2JJNS9mZUg0dCsrVWhYWHQ5WXVhdmtlcG1jTlYvZE9lK3VDVnNNSVowS2xLelRLekd2Z3ZhQUJpRDFUM2NBZU1VZzdJd3JUMVBIOStOQld0U1B0dzdaUmpSQnhPdmoycFRkT3dXT1dwS2kvVk1qcmxySDczcnQwOW1ZN2JWYmdTMEp2S001TzZlZlJuYytQSHJ6ZnVxMkMwdmNaMHpCTFIyRy9MelNsUnZ1dGx0Z3dKczhuTHVNcEZiVnVCSW5ISVl0ZHhJOStyTzU0ZmxnRk5mOFRLcGVnPT0iLCJhX2Rpc2Nsb3NlZCI6eyIxIjoiQXdBS05nQWFBQUZIMmprbFV0czVpQldTbEtMaE1qdmkiLCIyIjoiWUdCZ1lHQmdZRzg9In0sImFfcmVzcG9uc2VzIjp7IjAiOiJTMmtmWjdveEFCR3Zua1JUVWNYMkFlRmZlTjlqbUV4citlWXdkTzdxL2R6czZOZEs0NHk3SDhzUHZiWW5TeFE1VElCb1lrOGo2QXMwbitKMnZKWkI3U3Foa0ZOV2dyOGNESUU9IiwiMyI6IlJia29KbnA3cHVTM2xiQXgzVUV1aUM0NnU5aTdseFI4M3lZOEE5LzBjWU9LSnNxU1liNmh6cnpRRmpCMWlQSEdQS2lQRlArcCtwTzZmMXh2YTVZNEh0Nm1JSk5rNmRURnhrZksvN3pQVVBnPSJ9LCJjIjoib3NCQjdzYWJ3SVA1UnNUQWcrZGpJL3ZMYmFyNHE2dE1sa1huTWRsVmFrZz0iLCJlX3Jlc3BvbnNlIjoicTVuOW5QbkdkMzVQb3FocFlKa1NqUEdWOG1OL3FvMEhSVUxEWUFubkdBelVoRUYzaVhDempENW5Mc0NDNURnY0Fldjd6SEo4WGtWeG9FeFNTZEJkIiwidl9yZXNwb25zZSI6IkJjMDdjR0FvbFVzdURnMGEwKzFOaG5obXRBZFpMOElaby84bWNqVUNlanh6RGFjVEx1bEk3TEFvbytrdzRJTDJSVG40QkoxdGdkUTlEWHhPYXoxMDluVzBqUURUdEJCS2tacERVVzBMVmdYNExlR0NhVmF4N3N4VXd1aFhhT01JWlZFVmhTd25DRExncmd2RHhabEpaSDFTYjRaUHY3aUhPWlZNY0dJUjd5QjgyTGpXa3NIVi80amw4UjIxNlA4MmZmSTlmaTZ6amJrYld4M3RFN2ZoZGpxaVNGdS83UTRVSXBvODJCTVhZRHEvOENKaHBjb0d2WGg3VlVCaDdHc1RTWm9IWThDcTRpeE1ndnYyZDllbmwwZGZrTVh4aWNKTFdCZHZYV0xlYTl3c1RhR3FKa3B5TkhURE5aVGE1QW54bXEyTmZhTXhHM0JTNHJoL01sS0p4VmJKQ21LNlh3cHMzUnlqZC9MaDVLYURidFZBREdLaDUrNmdrKy84Z3hKTDRuQ0tkRTBTZW5NZkp1a09QUjYyT1A3N0RnWkxuOWxIYlM3Sk1rWURwRVNXQU9hRWNsZnVaRlU2M1VOYm5oZUhQOGVOMTZCRy92MDVyU0tINVROamxTUmY3MXRaOVZjblpybU8yR3cybzRvVDlFd3orbWx4aDhoTTZITTZvRWc2Q0ZqUWIzZGFBUzRnbTBMR2ZIRjZ2ejg9In1dLCJ0aW1lc3RhbXAiOnsiU2VydmVyVXJsIjoiaHR0cHM6Ly9rZXlzaGFyZS5wcml2YWN5YnlkZXNpZ24uZm91bmRhdGlvbi9hdHVtZC8iLCJTaWciOnsiQWxnIjoiZWQyNTUxOSIsIkRhdGEiOiJCdnRFOW5TMSs3dmcyVlpCQ3dQd2NsemJMbUVTUVI0WFA2ektoQ211QUZJWlJhZGRGUGR6ODFUejZaajZTQUhjUmk1N3JRNlYzSmc5b3djeE43RUFCUT09IiwiUHVibGljS2V5IjoiTUtkWHhKeEVXUFJJd05QN1N1dlAwSi9NL05WNTFWWnZxQ3lPKzdlRHdKOD0ifSwiVGltZSI6MTU4MTQxMDk4NX19fSwic3ViIjoidXJuOm9pZDoyLjE2Ljg0MC4xLjExMzg4My4yLjQuNi4xOjAwMDAwMDAwIn0.Sj7KqJDSYSD6Wjl48B-guNQoJNwpi-I9oy7JD4fhyUvYfvapLr2tCyxg5auY48h9Iwz3j2E71kQ242Nj7VgINqC94aUFpBBp79v9aDC3p-Sbr3RCZ2aiXGAmxhN8xerR0ETedhAeNZxFNLjkBlXhDxNHcDji11B_5mkQjTmymg_30x1CGQlJfXa_l31TPoSrPWGVxu3wWYKThTK1tpRzC_f9aTVHEvpFgqGLAgzY2BMNY7VwqXXMyRfrAAe2n8foiSA8lSVAa47CJWx0-4svWadcPBkwp1DgwxLoMKDceNy2ZY12kWYpHtwVgUdLq6Y7nv_As66ui0f06yMhTtRlEQ","proofStatus":"VALID","status":"DONE","token":"OgU0be4mkKr6bzsArJQr","type":"signing"}
+
+
+#. Construct a JWT Bearer token by submitting the Custodian, Actor, subject and Identity Token to the jwtbearertoken endpoint:
+
+   .. code-block:: console
+
+     $ curl --location --request POST 'actors.nuts-node.local/auth/jwtbearertoken' \
+       --header 'Content-Type: application/json' \
+       --data-raw '{
+          "custodian": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
+          "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:00000000",
+          "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:999999990",
+          "identity": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJudXRzIiwibnV0c19zaWduYXR1cmUiOnsiSXJtYUNvbnRyYWN0Ijp7IkBjb250ZXh0IjoiaHR0cHM6Ly9pcm1hLmFwcC9sZC9zaWduYXR1cmUvdjIiLCJjb250ZXh0IjoiQVE9PSIsImluZGljZXMiOltbeyJhdHRyIjoyLCJjcmVkIjowfV1dLCJtZXNzYWdlIjoiTkw6QmVoYW5kZWxhYXJMb2dpbjp2MSBPbmRlcmdldGVrZW5kZSBnZWVmdCB0b2VzdGVtbWluZyBhYW4gRGVtbyBFSFIgb20gbmFtZW5zIFpvcmdncm9lcCBOdXRzIGVuIG9uZGVyZ2V0ZWtlbmRlIGhldCBOdXRzIG5ldHdlcmsgdGUgYmV2cmFnZW4uIERlemUgdG9lc3RlbW1pbmcgaXMgZ2VsZGlnIHZhbiBkaW5zZGFnLCAxMSBmZWJydWFyaSAyMDIwIDA5OjQ5OjI1IHRvdCBkaW5zZGFnLCAxMSBmZWJydWFyaSAyMDIwIDEwOjQ5OjI1LiIsIm5vbmNlIjoid1l3WkRjMjlLRUJYUVU3U3hhdzlBZz09Iiwic2lnbmF0dXJlIjpbeyJBIjoiSUltZEh3QmQzMWdjcTlQM3hHUFo2NEdVYkNsRDBTRmo2eHVkdi9lRjh1MTBiQVRlVmZoUklLUVBMeGI3YXBzWmR6K0RXUlVVMEk1U2VPWnVTblpzZWtSUGc2eW9vQVBZcElSNmgzVTVMTDhzWVFKQ3c5Mk1SUGNaR0l2QW9OL2JJNS9mZUg0dCsrVWhYWHQ5WXVhdmtlcG1jTlYvZE9lK3VDVnNNSVowS2xLelRLekd2Z3ZhQUJpRDFUM2NBZU1VZzdJd3JUMVBIOStOQld0U1B0dzdaUmpSQnhPdmoycFRkT3dXT1dwS2kvVk1qcmxySDczcnQwOW1ZN2JWYmdTMEp2S001TzZlZlJuYytQSHJ6ZnVxMkMwdmNaMHpCTFIyRy9MelNsUnZ1dGx0Z3dKczhuTHVNcEZiVnVCSW5ISVl0ZHhJOStyTzU0ZmxnRk5mOFRLcGVnPT0iLCJhX2Rpc2Nsb3NlZCI6eyIxIjoiQXdBS05nQWFBQUZIMmprbFV0czVpQldTbEtMaE1qdmkiLCIyIjoiWUdCZ1lHQmdZRzg9In0sImFfcmVzcG9uc2VzIjp7IjAiOiJTMmtmWjdveEFCR3Zua1JUVWNYMkFlRmZlTjlqbUV4citlWXdkTzdxL2R6czZOZEs0NHk3SDhzUHZiWW5TeFE1VElCb1lrOGo2QXMwbitKMnZKWkI3U3Foa0ZOV2dyOGNESUU9IiwiMyI6IlJia29KbnA3cHVTM2xiQXgzVUV1aUM0NnU5aTdseFI4M3lZOEE5LzBjWU9LSnNxU1liNmh6cnpRRmpCMWlQSEdQS2lQRlArcCtwTzZmMXh2YTVZNEh0Nm1JSk5rNmRURnhrZksvN3pQVVBnPSJ9LCJjIjoib3NCQjdzYWJ3SVA1UnNUQWcrZGpJL3ZMYmFyNHE2dE1sa1huTWRsVmFrZz0iLCJlX3Jlc3BvbnNlIjoicTVuOW5QbkdkMzVQb3FocFlKa1NqUEdWOG1OL3FvMEhSVUxEWUFubkdBelVoRUYzaVhDempENW5Mc0NDNURnY0Fldjd6SEo4WGtWeG9FeFNTZEJkIiwidl9yZXNwb25zZSI6IkJjMDdjR0FvbFVzdURnMGEwKzFOaG5obXRBZFpMOElaby84bWNqVUNlanh6RGFjVEx1bEk3TEFvbytrdzRJTDJSVG40QkoxdGdkUTlEWHhPYXoxMDluVzBqUURUdEJCS2tacERVVzBMVmdYNExlR0NhVmF4N3N4VXd1aFhhT01JWlZFVmhTd25DRExncmd2RHhabEpaSDFTYjRaUHY3aUhPWlZNY0dJUjd5QjgyTGpXa3NIVi80amw4UjIxNlA4MmZmSTlmaTZ6amJrYld4M3RFN2ZoZGpxaVNGdS83UTRVSXBvODJCTVhZRHEvOENKaHBjb0d2WGg3VlVCaDdHc1RTWm9IWThDcTRpeE1ndnYyZDllbmwwZGZrTVh4aWNKTFdCZHZYV0xlYTl3c1RhR3FKa3B5TkhURE5aVGE1QW54bXEyTmZhTXhHM0JTNHJoL01sS0p4VmJKQ21LNlh3cHMzUnlqZC9MaDVLYURidFZBREdLaDUrNmdrKy84Z3hKTDRuQ0tkRTBTZW5NZkp1a09QUjYyT1A3N0RnWkxuOWxIYlM3Sk1rWURwRVNXQU9hRWNsZnVaRlU2M1VOYm5oZUhQOGVOMTZCRy92MDVyU0tINVROamxTUmY3MXRaOVZjblpybU8yR3cybzRvVDlFd3orbWx4aDhoTTZITTZvRWc2Q0ZqUWIzZGFBUzRnbTBMR2ZIRjZ2ejg9In1dLCJ0aW1lc3RhbXAiOnsiU2VydmVyVXJsIjoiaHR0cHM6Ly9rZXlzaGFyZS5wcml2YWN5YnlkZXNpZ24uZm91bmRhdGlvbi9hdHVtZC8iLCJTaWciOnsiQWxnIjoiZWQyNTUxOSIsIkRhdGEiOiJCdnRFOW5TMSs3dmcyVlpCQ3dQd2NsemJMbUVTUVI0WFA2ektoQ211QUZJWlJhZGRGUGR6ODFUejZaajZTQUhjUmk1N3JRNlYzSmc5b3djeE43RUFCUT09IiwiUHVibGljS2V5IjoiTUtkWHhKeEVXUFJJd05QN1N1dlAwSi9NL05WNTFWWnZxQ3lPKzdlRHdKOD0ifSwiVGltZSI6MTU4MTQxMDk4NX19fSwic3ViIjoidXJuOm9pZDoyLjE2Ljg0MC4xLjExMzg4My4yLjQuNi4xOjAwMDAwMDAwIn0.Sj7KqJDSYSD6Wjl48B-guNQoJNwpi-I9oy7JD4fhyUvYfvapLr2tCyxg5auY48h9Iwz3j2E71kQ242Nj7VgINqC94aUFpBBp79v9aDC3p-Sbr3RCZ2aiXGAmxhN8xerR0ETedhAeNZxFNLjkBlXhDxNHcDji11B_5mkQjTmymg_30x1CGQlJfXa_l31TPoSrPWGVxu3wWYKThTK1tpRzC_f9aTVHEvpFgqGLAgzY2BMNY7VwqXXMyRfrAAe2n8foiSA8lSVAa47CJWx0-4svWadcPBkwp1DgwxLoMKDceNy2ZY12kWYpHtwVgUdLq6Y7nv_As66ui0f06yMhTtRlEQ"
+       }'
+
+       {"bearer_token":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJodHRwczovL3RhcmdldF90b2tlbl9lbmRwb2ludCIsImV4cCI6MTU4MTQxMzQwMiwiaWF0IjoxNTgxNDExNjAyLCJpc3MiOiJ1cm46b2lkOjIuMTYuODQwLjEuMTEzODgzLjIuNC42LjE6MDAwMDAwMDAiLCJqdGkiOiI1ZGQyMTY4Zi04MmZmLTQ0OTgtOGU3Mi0zOGJlMmRlMTFlNzciLCJzaWQiOiJ1cm46b2lkOjIuMTYuODQwLjEuMTEzODgzLjIuNC42LjM6OTk5OTk5OTkwIiwic3ViIjoidXJuOm9pZDoyLjE2Ljg0MC4xLjExMzg4My4yLjQuNi4xOjAwMDAwMDAxIiwidXNpIjoiZXlKaGJHY2lPaUpTVXpJMU5pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SnBjM01pT2lKdWRYUnpJaXdpYm5WMGMxOXphV2R1WVhSMWNtVWlPbnNpU1hKdFlVTnZiblJ5WVdOMElqcDdJa0JqYjI1MFpYaDBJam9pYUhSMGNITTZMeTlwY20xaExtRndjQzlzWkM5emFXZHVZWFIxY21VdmRqSWlMQ0pqYjI1MFpYaDBJam9pUVZFOVBTSXNJbWx1WkdsalpYTWlPbHRiZXlKaGRIUnlJam95TENKamNtVmtJam93ZlYxZExDSnRaWE56WVdkbElqb2lUa3c2UW1Wb1lXNWtaV3hoWVhKTWIyZHBianAyTVNCUGJtUmxjbWRsZEdWclpXNWtaU0JuWldWbWRDQjBiMlZ6ZEdWdGJXbHVaeUJoWVc0Z1JHVnRieUJGU0ZJZ2IyMGdibUZ0Wlc1eklGcHZjbWRuY205bGNDQk9kWFJ6SUdWdUlHOXVaR1Z5WjJWMFpXdGxibVJsSUdobGRDQk9kWFJ6SUc1bGRIZGxjbXNnZEdVZ1ltVjJjbUZuWlc0dUlFUmxlbVVnZEc5bGMzUmxiVzFwYm1jZ2FYTWdaMlZzWkdsbklIWmhiaUJrYVc1elpHRm5MQ0F4TVNCbVpXSnlkV0Z5YVNBeU1ESXdJREE1T2pRNU9qSTFJSFJ2ZENCa2FXNXpaR0ZuTENBeE1TQm1aV0p5ZFdGeWFTQXlNREl3SURFd09qUTVPakkxTGlJc0ltNXZibU5sSWpvaWQxbDNXa1JqTWpsTFJVSllVVlUzVTNoaGR6bEJaejA5SWl3aWMybG5ibUYwZFhKbElqcGJleUpCSWpvaVNVbHRaRWgzUW1Rek1XZGpjVGxRTTNoSFVGbzJORWRWWWtOc1JEQlRSbW8yZUhWa2RpOWxSamgxTVRCaVFWUmxWbVpvVWtsTFVWQk1lR0kzWVhCeldtUjZLMFJYVWxWVk1FazFVMlZQV25WVGJscHpaV3RTVUdjMmVXOXZRVkJaY0VsU05tZ3pWVFZNVERoeldWRktRM2M1TWsxU1VHTmFSMGwyUVc5T0wySkpOUzltWlVnMGRDc3JWV2hZV0hRNVdYVmhkbXRsY0cxalRsWXZaRTlsSzNWRFZuTk5TVm93UzJ4TGVsUkxla2QyWjNaaFFVSnBSREZVTTJOQlpVMVZaemRKZDNKVU1WQklPU3RPUWxkMFUxQjBkemRhVW1wU1FuaFBkbW95Y0ZSa1QzZFhUMWR3UzJrdlZrMXFjbXh5U0RjemNuUXdPVzFaTjJKV1ltZFRNRXAyUzAwMVR6WmxabEp1WXl0UVNISjZablZ4TWtNd2RtTmFNSHBDVEZJeVJ5OU1lbE5zVW5aMWRHeDBaM2RLY3podVRIVk5jRVppVm5WQ1NXNUlTVmwwWkhoSk9TdHlUelUwWm14blJrNW1PRlJMY0dWblBUMGlMQ0poWDJScGMyTnNiM05sWkNJNmV5SXhJam9pUVhkQlMwNW5RV0ZCUVVaSU1tcHJiRlYwY3pWcFFsZFRiRXRNYUUxcWRta2lMQ0l5SWpvaVdVZENaMWxIUW1kWlJ6ZzlJbjBzSW1GZmNtVnpjRzl1YzJWeklqcDdJakFpT2lKVE1tdG1XamR2ZUVGQ1IzWnVhMUpVVldOWU1rRmxSbVpsVGpscWJVVjRjaXRsV1hka1R6ZHhMMlI2Y3paT1pFczBOSGszU0RoelVIWmlXVzVUZUZFMVZFbENiMWxyT0dvMlFYTXdiaXRLTW5aS1drSTNVM0ZvYTBaT1YyZHlPR05FU1VVOUlpd2lNeUk2SWxKaWEyOUtibkEzY0hWVE0yeGlRWGd6VlVWMWFVTTBOblU1YVRkc2VGSTRNM2xaT0VFNUx6QmpXVTlMU25OeFUxbGlObWg2Y25wUlJtcENNV2xRU0VkUVMybFFSbEFyY0N0d1R6Wm1NWGgyWVRWWk5FaDBObTFKU2s1ck5tUlVSbmhyWmtzdk4zcFFWVkJuUFNKOUxDSmpJam9pYjNOQ1FqZHpZV0ozU1ZBMVVuTlVRV2NyWkdwSkwzWk1ZbUZ5TkhFMmRFMXNhMWh1VFdSc1ZtRnJaejBpTENKbFgzSmxjM0J2Ym5ObElqb2ljVFZ1T1c1UWJrZGtNelZRYjNGb2NGbEthMU5xVUVkV09HMU9MM0Z2TUVoU1ZVeEVXVUZ1YmtkQmVsVm9SVVl6YVZoRGVtcEVOVzVNYzBORE5VUm5ZMEZsZGpkNlNFbzRXR3RXZUc5RmVGTlRaRUprSWl3aWRsOXlaWE53YjI1elpTSTZJa0pqTURkalIwRnZiRlZ6ZFVSbk1HRXdLekZPYUc1b2JYUkJaRnBNT0VsYWJ5ODRiV05xVlVObGFuaDZSR0ZqVkV4MWJFazNURUZ2Ynl0cmR6UkpUREpTVkc0MFFrb3hkR2RrVVRsRVdIaFBZWG94TURsdVZ6QnFVVVJVZEVKQ1MydGFjRVJWVnpCTVZtZFlORXhsUjBOaFZtRjROM040VlhkMWFGaGhUMDFKV2xaRlZtaFRkMjVEUkV4bmNtZDJSSGhhYkVwYVNERlRZalJhVUhZM2FVaFBXbFpOWTBkSlVqZDVRamd5VEdwWGEzTklWaTgwYW13NFVqSXhObEE0TW1abVNUbG1hVFo2YW1KcllsZDRNM1JGTjJab1pHcHhhVk5HZFM4M1VUUlZTWEJ2T0RKQ1RWaFpSSEV2T0VOS2FIQmpiMGQyV0dnM1ZsVkNhRGRIYzFSVFdtOUlXVGhEY1RScGVFMW5kbll5WkRsbGJtd3daR1pyVFZoNGFXTktURmRDWkhaWVYweGxZVGwzYzFSaFIzRkthM0I1VGtoVVJFNWFWR0UxUVc1NGJYRXlUbVpoVFhoSE0wSlROSEpvTDAxc1MwcDRWbUpLUTIxTE5saDNjSE16VW5scVpDOU1hRFZMWVVSaWRGWkJSRWRMYURVck5tZHJLeTg0WjNoS1REUnVRMHRrUlRCVFpXNU5aa3AxYTA5UVVqWXlUMUEzTjBSbldreHVPV3hJWWxNM1NrMXJXVVJ3UlZOWFFVOWhSV05zWm5WYVJsVTJNMVZPWW01b1pVaFFPR1ZPTVRaQ1J5OTJNRFZ5VTB0SU5WUk9hbXhUVW1ZM01YUmFPVlpqYmxweWJVOHlSM2N5YnpSdlZEbEZkM29yYld4NGFEaG9UVFpJVFRadlJXYzJRMFpxVVdJelpHRkJVelJuYlRCTVIyWklSaloyZWpnOUluMWRMQ0owYVcxbGMzUmhiWEFpT25zaVUyVnlkbVZ5VlhKc0lqb2lhSFIwY0hNNkx5OXJaWGx6YUdGeVpTNXdjbWwyWVdONVlubGtaWE5wWjI0dVptOTFibVJoZEdsdmJpOWhkSFZ0WkM4aUxDSlRhV2NpT25zaVFXeG5Jam9pWldReU5UVXhPU0lzSWtSaGRHRWlPaUpDZG5SRk9XNVRNU3MzZG1jeVZscENRM2RRZDJOc2VtSk1iVVZUVVZJMFdGQTJla3RvUTIxMVFVWkpXbEpoWkdSR1VHUjZPREZVZWpaYWFqWlRRVWhqVW1rMU4zSlJObFl6U21jNWIzZGplRTQzUlVGQ1VUMDlJaXdpVUhWaWJHbGpTMlY1SWpvaVRVdGtXSGhLZUVWWFVGSkpkMDVRTjFOMWRsQXdTaTlOTDA1V05URldXblp4UTNsUEt6ZGxSSGRLT0QwaWZTd2lWR2x0WlNJNk1UVTRNVFF4TURrNE5YMTlmU3dpYzNWaUlqb2lkWEp1T205cFpEb3lMakUyTGpnME1DNHhMakV4TXpnNE15NHlMalF1Tmk0eE9qQXdNREF3TURBd0luMC5TajdLcUpEU1lTRDZXamw0OEItZ3VOUW9KTndwaS1JOW95N0pENGZoeVV2WWZ2YXBMcjJ0Q3l4ZzVhdVk0OGg5SXd6M2oyRTcxa1EyNDJOajdWZ0lOcUM5NGFVRnBCQnA3OXY5YURDM3AtU2JyM1JDWjJhaVhHQW14aE44eGVyUjBFVGVkaEFlTlp4Rk5MamtCbFhoRHhOSGNEamkxMUJfNW1rUWpUbXltZ18zMHgxQ0dRbEpmWGFfbDMxVFBvU3JQV0dWeHUzd1dZS1RoVEsxdHBSekNfZjlhVFZIRXZwRmdxR0xBZ3pZMkJNTlk3VndxWFhNeVJmckFBZTJuOGZvaVNBOGxTVkFhNDdDSld4MC00c3ZXYWRjUEJrd3AxRGd3eExvTUtEY2VOeTJaWTEya1dZcEh0d1ZnVWRMcTZZN252X0FzNjZ1aTBmMDZ5TWhUdFJsRVEifQ.TF8lmmSQ4WkznMXLmh6JTA0cYwSrKoKd_yK7jKzweyAZhIGv9tmxGASZ7cIg9495U9SsyGVSQUpvY0gMIYLIRENzUJ1rUCS1kYSDrIvp13DRwGrz74f7SAp8hQXer1R4wgn9OfZ5Skx-A9bSaoWoko8IIV-Tvo1XMHLhqV-msQig5Q-IFoYtsBkdhdDBSaDEy9-LJcjK5eU0Ymc781KRz5usdz3ta6QMfqfg_Ypx2NuID5bJg0Mcnw6nooMreQl7lgO_clyJGfUdS0v2A7pCXi6Vc2c9zRxdNKJSLd65odDrvfhcHGNlaGZrMn07phmT13YR0e4rBAV1tkapERp23Q"}
+
+#. The client application requests a access token providing the JWT Bearer token
+   This is described in the :ref:`nuts-documentation-access-tokens`
+
+   .. code-block:: console
+
+     $ curl --location --request POST 'https://custodians.nuts-node-local/auth/accesstoken' \
+       --header 'Content-Type: application/x-www-form-urlencoded' \
+       --header 'X-Nuts-LegalEntity: Demo EHR' \
+       --data-urlencode 'grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer' \
+       --data-urlencode 'assertion=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiI2M2RkYTg5Mi03ZDRkLTQwNTktYjNiZS1iNzNjOTEzNmUzODUiLCJjdXN0b2RpYW4iOiIiLCJleHAiOjE1ODI2MjkzODcsImlhdCI6MTU4MjYyNzU4NywiaXNzIjoidXJuOm9pZDoyLjE2Ljg0MC4xLjExMzg4My4yLjQuNi4xOjAwMDAwMDAwIiwianRpIjoiMWFkMmRhNjUtMDcxZC00MjY3LWFkNDctNDA3ZjIxM2MxNzgwIiwic2NvcGUiOiJudXRzLXNzbyIsInNpZCI6InVybjpvaWQ6Mi4xNi44NDAuMS4xMTM4ODMuMi40LjYuMzo5OTk5OTk5OTAiLCJzdWIiOiJ1cm46b2lkOjIuMTYuODQwLjEuMTEzODgzLjIuNC42LjE6MDAwMDAwMDEiLCJ1c2kiOiJleUpoYkdjaU9pSlNVekkxTmlJc0luUjVjQ0k2SWtwWFZDSjkuZXlKcGMzTWlPaUoxY200NmIybGtPakl1TVRZdU9EUXdMakV1TVRFek9EZ3pMakl1TkM0MkxqRTZNREF3TURBd01EQWlMQ0p6YVdjaU9pSmxlVXBCV1RJNWRXUkhWalJrUTBrMlNXMW9NR1JJUW5wUGFUaDJZVmhLZEZsVE5XaGpTRUYyWWtkUmRtTXliRzVpYlVZd1pGaEtiRXd6V1hsSmFYZHBZekpzYm1KdFJqQmtXRXBzU1dwd1ltVjVTbXBKYW05cFZWZFZkMVJZUmt4VFF6aDNXWGs0TVZkSFRrTlVlWFJYV2xaR1RrMXJOVXRUVjFGNFltczBNRTlGWjNwWmJFSlVVM2s0ZGxJd01UTk9SREJwVEVOS1FrbHFiMmxrV0ZKdlUyMDVSMWRJYUROYVJrcENWVEpXZFZaSVJteGFNVzh4VjBaU1NHTnJTblpUVjFveFRqSmFNMk5FUVRKUlYwWlFZVzVuZUZaSVJsWmhTRTVFWWtWV2NFMUVVWHBSTURGc1ZHMUtXbHBFUVRCaVJVcFdaRzVyZG1ScVp6VmFhMUpSWWxjNU5tRlhOV3hPVkZwdFVqTmFNa3N4YUc1VmJXdDNVakpvV2xwSFZreFhSR1J4VlRJeFdWUlZNV2hUUjJjeFZVZFdTbGRXVVhKaU1VMHdUbFprVFZSVWJHeE9WVEZ3VjFSU1lVMTZRbnBaVlRWeVdXNVdSR0Z0ZEhWbGExbzBUako0VWxONlpITlhSRnBKWWpOU2JsSjZiRzlqU0c4MVUwVkdhMlZIV2s1UVUwbHpTVzFXWm1OdFZucGpSemwxWXpKVmFVOXBTbWhqTVVKU1l6RlZkMXBWWXpKVk1teHFWMGhqTTFKSVRsWldWbWQ2WW01bk1FeDZVVEJrU0c4elRqRkNWRlZGYUZOV2JVWmhVa1JWTlUwd1JuVlVWbU41WW5wT2NscHFXbTVPVlVwYVlqRmFkVlZUZEZoV00yaE1VVzA1V1dOSVJtMVdWM1JSU1dsM2FXUnNPWGxhV0U1M1lqSTFlbHBUU1RaSmEwVjJWREprVkU1c2FFaGlSRVoxWlZVNWJHUkhTazVWTTBac1lrZDNORTVIVm5KT1ZsSndUbTVXZG1Jd1pFUmxTRkphVmtjeGIyVlhUVEJqUmxGM1VqQkpNMU5yVmxoVVIxWm9ZVmhqY2xKSFpEUk5SRXBWVERKR2VtRkhSakZXVkU1eVVrUm9SR0pXUmxaa01HaEtUbFpPTmsxVVpFbGlTRnBMVDFVMU5XRklTVE5PUTNSSllUQktSMVpHY0ZKbFZFWk5UakZDVUU5RlNrWmllbVJyV1RCNFJVNXFXbmRPV0dob1ZXNWpOVkZzUmpSV1EzUllVMnM0ZUdSVmRIVlVNRkpOVTFWak5HSldaekpVTW5CSVZqTk9NbFZHUm5sTU0xbzBWRlV4ZUZVd05ERmFWVkpzVTFoa1VscFlhM1pYUjJRMFdUSndVazFyVm5wYWFUbFdaRzVOTW1ORlRraFphVGd6WlZaS2FtRnRVVEJpUmxwTVpVZDRNbUV3VWs1V1ZFWlJXbnBzY0Uwd1l6UmlNVkYyVTFWS01HVnFVbXBoYWxaMVpHeG5kMUpWVm1oaGJsbDJVbFJHZFZaSFVUVmtlWFJEVjI1Rk0xb3llRzVNTUVwc1pHNXNlVlZIYkVWaGJXUkNUMWhGTlZsVlNtbE5lVGd3VVZjNWMxSnFTalpWYlhCeVZtMVdWVk50VWtaaGJHeG9WRVJPZW1WSFNuUlJNMnhJVFVkb2QxTkZhSGRrYmtKVlRqQk5ORTlZVW5kV1JUZ3lVekZHV0dRd1pFbGlNVXB4WkZkSk5WZHFSV2xNUTBwb1dETktiR016UW5aaWJrNXNZM2xKTm1WNVNYZEphbTlwVlRKb01FMHdSa2hOUjNoUVlXMTRjMk5yT1ZsTE1VSnlVa2MxZVZaSWJFOU5iRnBXVmtkd2VFMHdjekJPVmtKaFZEQjRkMkpYUlhwaFYyaFFZMWhHYWxwSVFrVlNNRnB6VFc1V1VGVXdaekpVV0U1VFZWZGtRbUpGVlhsa1JsWkdUa2RLYWxSdFVYWlhWMW93V2todmVHSjZhRVZYVmtKRVZqQktiVlZIYUVOVGJGWjJVRk5KYzBscVJYZEphbTlwWkcxT1ZVOUViRzFhUnpsRFpGVnNjMXBzUWxoTmJtUjBVMFJvYUZFelNsTk1lazE2WXpGYWRWbHRjM1pQVlZsNVVWWnJOR05zVGtSaVZ6aDRWakZ2TVZSVVNubFZWMXBoVlcxU2NHRllTa3hUTUZaeVdqSldibG95TlZoWk0yODFUV3QzTlZReVJtdGhWVlpEVEhwTmVHRkZVbTFQVnpBMFdrVk9hR1Z1YUZsT2JGSldVRk5KYzBscVJYaEphbTlwVW0xMGRrMUdRbFppTTFVMVZFaG9iR1ZHVGxoTlJuQlNXVzVTUzJKclVtMWlWbkJHWkZWT05GcDZUbXhsVldONldqRmtWazB6Vm1wbFNGWkhVakI0YzFveFduWmpSbHBLWTI1Q1ZHUXliek5UTURreFZqTnNTVkpGVGpWbFdHeDJUV3h2ZVdWVlVUQk9la3A1WkZSV1dVMVVWa1JsVlhSYVRWaE9UbVZITlVaWk1GSkNVRk5KYzBscVJYbEphbTlwVmtSQ1JWTkhkRkJqVkZrMVYycEdlbGRIYkhaV1Z6RjZaVzFvVDJKc1VrWmlSVEZxV2pGd2QxSkliRXBXYlhoTFlqRlpkbVF5TVd0T00xRnlUa1JPTm1WVE9WaFRWWFJWVlVNNVlVOUZNV3BSTWs1S1ZHMTBURlZJVlhwV1JHaFVUMFJHYkZac1dqTmFhbHBLV1ZWc2FHTlhUVEZpU0VaWVUzcEdhMUZ0TVZkTmJGcEdVRk5KYzBscVJYcEphbTlwVW1sMGQwNHdkSGRVU0Zrd1RqQkplVkpyYUVSVlEzUXhWRmhvVjJGNmFIWlVSM0JHWkd4Q1NHVnRkRVpOYlU1cFkxTjBiMDB4U2xsVE1uUlpWRWRhY0ZORVFqQlVWMlJEVlVNNVdtVkdTa3BoZW14NFZGWnNUbU5zVGpGYVIzaFVVMFpDTmxOck1YRmxWVTVWWVVSYWJGVXhhSFZoYlhST1RIcE9SMU5FU21GWmF6RnVVRk5KYzBscVJUQkphbTlwVjFSU2FVOUdWVEJQVjFwd1ZYcENObEV4UWxsVE1WWkhUMGRrVVVzeFNscFJNbWR5WkVkNFdHVlVTazlQV0ZKdFVWZDRTbEZxVlRKVVV6bElWVVpXYVZSdGFFdE5SRTF5WWxoR2VFMUZhek5UTWtwb1VqSkZkMVZFUm5wYVJrNU1VbGQ0VjFJeWNIWlVlWFJMV1ROS1dsSlhhRVJrTTJRMVZYcEthRlJ1Um1GWGFteFNVRk5KYzBscVJURkphbTlwVGxoYWJXUkdZekZUVlZKb1VXNWtlR1ZFWkU1VlIzaFNXbFphVlZvd1pHeGtWVlpHVVZaQ1ZrMHlUVEpQUjFKUFl6SlZjbGx0YkVKYWEwWm9ZekpHUm1SVGREQlpWbHB5VFcxb01FNUdUazlVVld4WFZHNVNhVkp0YUhKT1ZsWXhaRmh3V21OSGJIQmlSWEJOVjFkb2RXRlhNV3BpVkZKVVdUQlNUVTVVVG5KaE1HaEdVRk5KYzBscVJUSkphbTlwVldwT00wNUZaRmxpYTBwV1RUTlpOV1JXYkVKVlJWSmhWVlZhU0ZGdGEzbFJWMW8wVkcxU2RWSkZkREprYlRWU1YxUkNRbE5YZUhSYU1FVXlaRlJDUmsxNlkzWlpWbEl6VlRCb2MxZElVbEJTTVZad1lUQldORkpYTVV4VU1VcHFZMFJvVTFkWFdtOWhWMDUwVm1sMFRWSnBkSFJsV0VKTlpFaEJkazlYYkdsVU1GSk9VRk5KYzBscVJUTkphbTlwWTNwSk1VMHdWa2RPYTI5MlZHMXpOR1JGZUhGVlJWWk5VbTFKTWxadFRuWk5SMVpIVFVSa1ZFMVdSakpaTUhoaFVsVXhiV1ZYZEVSU2JtUkpUV3haZGxkWVp6TlZNMlJ2VW14a2NXVlVRakJWYXpWcFQwUnNZVlJHYkU5TU1FNWhZV3RLTldRelJteFZiazEzWTFaS1YxSllSbXRTVmxaWFpGWk9RbFJ1V2tWU1NHTXdVRk5KYzBscVJUUkphbTlwV1ZVMWFGSnJNRE5sVlRFMFpVaHdTV0ZXWkdwaFJXeGhaVlZXVm1GWVJsTmpWVTR5VG5wb1ZHSlhhSEpXVTNSdFVWZFNkMDVEYzNsWGJUbExXa1JPZEU1dFZYbFJla1pvWTJwU1drMXFZM1paTUZwTFVqTmtSVlJFYkhwWmVtY3pXakZGTlZKNlVrNVJNMnQyWWpGb1UwMVZaekpPV0dReFlWVkdNRTU2VmxkaldFSnVVRk5KYzBscVJUVkphbTlwVGxkS1ZVdDZaRmRrVkVaUFdtdGtWRmRIYjNwVGJFSldZMFY0VkdKV1NsZFNTRkozVERJeFZVc3pWakZsVlRGYVRrUktWa3N5WXpCTlZrSnRURE5PTldSRGREQkxNMk0xWkc1d1ZXRnRkSEJOVlRsRFltNXdVbGt6UlhsVVJrRXlVMGhvYjJSVlduZFVSMUpVVlZSb2RtUnNhRTlrTVVwSFlWaFZNMWRXYkZkTmJYYzBVRk5KYzBscVNXbFBhVWw2WkRKek1XRnVXbGxhTVVrelZrVTVUMk5xWkRaWk1VSnJWMnBTVDJGVWFFdGphVGxRVG0xU2JFNUhkRWxpYlVwWFUzcEtiRTVHWkV0VmVrcHZaVVpDYW1OVmRGbE5WbFpEVFd0UmVsTnRhRlpYYm14T1dXMXpNRXN3YUdoUmJrNUhZak5OTTFSSE9EVk9SM0F5WkcxU1RrMUdhREprYWtKeFRtcE9OR0V4VmxGVFZVVTVTV2wzYVU1NVNUWkpiVlpUVlVSYWJsRXdhRmxPUnpGellrYzFhRmRVYkVSU1YyeEdWRlJPVFZSR1ZuSk5SVXA0WWxkS2NWWlhXbTlXU0ZKdFUxVlJNbFJxVWtsV1JGWlBVV3RyTkUxRmQzWmhWa3B4WlVkS1EwOVVVakZSTTBGeVZrWktlR0pGTVVaaWFUbENUVzF3TlZsVGN6UmxhM040VTBkT1NHTjZTa2xrTUhSRFVsVmtObEZZWTNoa2VqQnBURU5KTkVscWIybFVlVGt3VVcwNGRtSnRhRmhTTVZvMFRucHJjbVJzWkhCWlZFNXFWMnhzY1dWVWFGaFRSa3BoWkVWR1NGbHNSblZSV0VKS1VWZE9hVmt3U2s5V01GWlZTekZLTW1GclNtaGlWa0pKVFRJMWRGTXdSblprYkU1SVkzazRlRlF5VWs1a01HeFZWMGhXVFZVd2JGWlVWbXhKWWtSSmVXTXlSbk5TVlRGd1VXNUJNV0ZxVm5wUVUwbHpTV3ByYVU5cFNYWk9WRXA2VlVNNE1WbFhXa2hOYkdkNVdqTkdTbE5UT1dwWGJGcHpWRWhqZVU1RVFYcGphMDVLWld4ak1rOUdXbUZhVkdoYVRrWldhMkpVYUROVVIzQlVXbTFuY21OSVVtOVNSV04zV2xWb1RGSXdaSEphTWtZMVRXdHdOazFYZERWaU1qVnhUbFJhYVZGNlZUVk9hMlJVVVRCS1MxWjZWa2RqYlZJMFVrVldWbEl5VFRsSmJqQnpTVzFHWmxwSGJIcFpNbmgyWXpKV2EwbHFjRGRKYWtWcFQybEtRbVF3Umt4VU1FWkNXVlZHUWxKSWNFWlNSWFJDWkVoc1JFOVZWbEJpVjNRMlZVVmtURlJYTlZkUFEwbHpTV3BOYVU5cFNubGtSWGhhVFdzeGVWWXpiRE5RVkRCcFRFTkpNRWxxYjJsbFZURjZVRk5KYzBscVZXbFBhVXB2VkRGU2VFMUlVbFZhUTBselNXcFphVTlwU25sa1JYaGFUV3N4ZVZZemJISlNSV3cxWVRCT1JrNVZPWGxWZWtaUFRVUXdhV1pZTUhObGVVcHFTV3B2YVZWWFZYZFVXRVpNVTBNNGQxbDVPREZYUjA1RFZIbDBWMXBXUms1TmF6VkxVMWRSZUdKck5EQlBSV2Q2V1d4Q1ZGTjVPSFpTTURFelRrUXdhVXhEU2tKSmFtOXBWVmQ0ZDAxVVRqWlpibFo2WkZjMU5FNUdUa1JTVlRCMlltcEtTbUZJU25KaFYwNTRUVVJXWVU5WE5WZFRhbWQ0VTFWR1ZGcEZPWGRqVkZwclVXNU9jMlJ0U214Wk1IUldXVmhTTTJKWVRuSlRWMFpKWVROV1RsRnNXazVrUldocVZGVkdOVk15VWpaWk1HdDZXVlJzUjFwR1NrbFNhekUwVVRCT1dHVnJjR2hTUmxVeFVWaG9jR016VVRKTk1YQndaVWR3V21SWE1IWmlSRXBxWTBjNWFGcHJiRXBhTUZKSFRsWkdiMVJXYjNoTk1qVjFWMWhvYVdReWNFWmliR1JRVVZoQ01GVllRbE5UYm1SQ1YwTnpNRlo1ZEZCVFIxWXdZVEJHVGxReldrNVdSazVUVDBWdk1WVlhXa2hWUjFJeFVsZGtjRkl3VmtoWmJGbzFXbTFrUTA5R1NuTmhlbXhDVm01YWMyUlhkR2xoV0VaU1pGVk9kMVpGVGtSbFYxSnpXVmQ0UW1GWVJqSmhWM2hzV1cxYVdrdDZRbGxMTURWelRWUlJlVlp1Y0ZoWGJYaFlZMGhCZGxVeU5IbFViSEJoVm01d1JrMUhlRU5oUlU1WVkxWmtVMkpXWnpSTU1GWnlZVVZXVDFkV1FrOVZSa0V5WVcweE5GVklTbE5rVlRSMlkyeHNNbFZZV2pSU2JuQlJWbFV4Vm1OVWFETk5lbHBwVFVoR2RrNHdiM0pWYTJSRlUwWm9iMWt4VWt4amJXUXdWRlpTUWt3eFRYaFVTRzgwVW5wU01sSkZkSEpUUTBselNXMVdabU50Vm5walJ6bDFZekpWYVU5cFNtOWhiRnBVV1dwa1NGTkVXa0pWU0U0elVsVlNWRmxZYkhKWmJscFpVMVJaTlZaclozSlphMHBGWkd4Qk1sVlRkRTlVYTBwMFYwaGFUR0pFYkc1aE0xWm9UV3RXU2xacVJsVmFTR3hZWWpCYVUwNTZSbEZoTVZKVFN6TmFURXg1T1RCU2VYUlFUVmRrVEdGSGQzWlRSWGRwVEVOS01sZ3pTbXhqTTBKMlltNU9iRWxxYjJsVGVtUkpZakowZFUxcE9UUmpSVEI0VWpCUmRtTlZaRzVqU0VFeFQxYzFUVlJWUmpCT2FrNVlVMVphZVdGVVRYZE9ia1p0WVROa1JFNXFTVEZXTVd4NVZrZG9lR0ZGTUhoTmJrSnFXWGs1YlU1V2FFOVZiR3gyVGxSb1NVMUlTalpOTUd4MlpXeHdTR0V6VW0xUmJHaDJWVlJTU0dSVlVYcGxiVnBEVlVoT1VsbHRVbTFqZWs1b1RUSnNVMkl3Um01a1F6bEpUbFZXYkZaVk5VMWxWMUpxVGxab1JXUXpXbkZUYWxJeFZGTjBiMWR1UW5GWk1sSkdaREExYmxONU9WaFJWMVpVVjBad2FtUlVXbkZNTW1neldteGtNMWRYYUZCU1F6bG9aVVpHVWxWSVpGTk9RemcwVFVWV00yTkZSbE5oUmxGNVZWVnplbGt3V25kT2JWWnRZbFZSZDFWWFp6RmFiRW94VGpGc2JWVXpSVE5TTTJ4SlYwVnZjbGRYU25STlYxb3pUSHBvYWs1R1JsTk5SMW93VDFSc2QxSXlVbkJOUldjMVV6SkpkMW94UWxSaU1EVkdaRlpvVlZJd1JYbFZlbHB4WWxjNVdXTXpUa3BWTVZwaFdsUm9UV0ZJUWtsYWExWmFVekpvVEZJeVJsZGhWbFp0WTIxb05tRkZNVVppV0VJMlN6SjRkMU5ZWkZKV2FrbHlVMnM1ZDJOVVJUUmxXRXBoVmpGQmQyUlVhSEpqVlRWWVYycENVVlpFVlRGU01ERk9Va1ZOZVdGc1JsSmpWVFZxWWtkMGExTlhhR2xSYm1oYVUyMWtVVlZJWkV4WFJra3pUbTF2Y2xGWWFIaGFTR2N5V2xoT1IxTjVPWGxWV0dScFVqQldRbE15U25kVGJVVjZaRE5DVjA1R1VraE1NbWh5VGtkR00xVldjR0ZqZW1oaFkwaFNSazVHUW01YWJWcFBaVzFWZW1JeWNIcGpWRlpUVmtaU1EySnJiRmhpUms1UFlUSTFjbFJyVGtWWmJXd3lZMFZvYW1GSGRFbFhSRkV5WkVoV01sVnNSa2ROV0doM1YwaFplbFJFV1hkVk1IaEtXV3hLUjJKVVNqSldXR1J0VFhwa1JWZHNSa3hOUjJRMVlsUmFhVlJHUW1GbFJrcFRWVVpLUmsxRGRFaFVWa1oyVFcxa1UxWnJVWFpqUjJRMldraFJlbUp1U2toVk1VbHlXV3RrTVZSdVRuaGxWMnh2VGpOT01Fc3dOREpoTTA0elVGUXdhVXhEU21oWU0wcHNZek5DZG1KdVRteGplVWsyWlhsSmQwbHFiMmxUUlZKT1ZteGFhMWRyZEZsVU1taHdaRWhzY2xkVlZUVlphbEpEVW10R01VMXRVVEZYYTNkeVVWUmFTRk14V21oWmJXaEdaRzA1UldKcmNGaGFSbXhPVmxaak5GWnNXbkJPTWxKQ1dsZGFTbEp1Y0cxUFJVWjVZV2s1ZFU0emJHRmFNREZQVGpKSk1VOUlRbXBYVkVsM1VraE9UMDlYVmxCVk1sRjZaV3M1UkZvd1VrdE1NMnhWWkVkb1JsbHNWVGxKYVhkcFRYbEpOa2xzVmpGbFZHUnhaREZLVTJGRWFGQmhhbFUwVFZSV2VHUkhiRWRVTUhoMVRucEdSMDFXWnpOVlZVWnhWV3N3TlZwdVdubGhNVUV5V20xd1lVc3dkRzlPUlVrelVXcGtRbE5IYTNKaFNFNTFXV3R3VjJFeFRYWlRSVkYyWVVoT1YxWkZVVEJhYTNSVVVWaFplRmxxYUd0WFJteE9XVE5LYkUxSVJscE9TRkpzV1ZWVk1WZEhXVE5aV0U1b1lVVjRWbEJUU2psTVEwcG9XREpTY0dNeVRuTmlNMDVzV2tOSk5tVjVTWGhKYW05cFVWaGtRbE13TVc1UlZFSkNVVlpTY0dKclVuUlRNREV4VlcxNFVsb3dlSGhXUjNRMlVraE5OVlZ0TUdsTVEwbDVTV3B2YVUxdVRrMVZla3BLVWtjd00xUlZlR3BsVlRGNVlYcGtUbU5yT0RKU2JuQnFUV3hGT1ZCVFNqbG1WakJ6U1cxc2RWcEhiR3BhV0UxcFQyeDBZbVY1U21wamJWWnJTV3B2ZDB4RFNtaGtTRko1U1dwdk1tWlRlRGRKYlU1NVdsZFJhVTlxUVhOSmJVWXdaRWhKYVU5cVRqbE1TSE5wV1ROS2JGcERTVFpOUTNkcFdWaFNNR05wU1RaT1NEQnpaWGxLYW1OdFZtdEphbTkzVEVOS2FHUklVbmxKYW04eFpsTjROMGx0VG5sYVYxRnBUMnBGYzBsdFJqQmtTRWxwVDJwS09WaFdNSE5KYlRWMlltMU9iRWxxYjJsUmF6VjNXbXR3VEZwWE9ISmpWelV3WlVoa1Uxb3pWbTlWVnpWUVZWUXdPVWxwZDJsWk1qbDFaRWRXTkdSRFNUWkphMFpTVUZRd2FVeERTblJhV0U1NldWZGtiRWxxYjJsVWEzYzJVVzFXYjFsWE5XdGFWM2hvV1ZoS1RXSXlaSEJpYW5BeVRWTkNVR0p0VW14amJXUnNaRWRXY2xwWE5XdGFVMEp1V2xkV2JXUkRRakJpTWxaNlpFZFdkR0pYYkhWYWVVSm9XVmMwWjFKSFZuUmllVUpHVTBaSloySXlNR2RpYlVaMFdsYzFla2xHY0haamJXUnVZMjA1YkdORFFrOWtXRko2U1VkV2RVbEhPWFZhUjFaNVdqSldNRnBYZEd4aWJWSnNTVWRvYkdSRFFrOWtXRko2U1VjMWJHUklaR3hqYlhOblpFZFZaMWx0VmpKamJVWnVXbGMwZFVsRlVteGxiVlZuWkVjNWJHTXpVbXhpVnpGd1ltMWpaMkZZVFdkYU1sWnpXa2RzYmtsSVdtaGlhVUpyWVZjMWVscEhSbTVNUTBGNVRsTkNiVnBYU25sa1YwWjVZVk5CZVUxRVNYZEpSRVY0VDJwUk1FOXFSVEZKU0ZKMlpFTkNhMkZYTlhwYVIwWnVURU5CZVU1VFFtMWFWMHA1WkZkR2VXRlRRWGxOUkVsM1NVUkZlVTlxVVRCUGFrVXhUR2xKYzBsdVVuQmlWMVo2WkVkR2RHTkRTVFpsZVVwVllWY3hiRWxxYjNoT1ZHZDVUbXBKTTA1VVFUQk1RMHBVV2xoS01scFlTbFpqYlhkcFQybEtiMlJJVW5kamVtOTJUREowYkdWWVRtOVpXRXBzVEc1Q2VXRllXbWhaTTJ4cFpWZFNiR015Ykc1aWFUVnRZak5XZFZwSFJqQmhWemwxVERKR01HUlhNV3RNZVVselNXeE9jRnA1U1RabGVVcENZa2RqYVU5cFNteGFSRWt4VGxSRk5VbHBkMmxTUjBZd1dWTkpOa2xxV25STlJFNDBWR3BXUms5V2J6RlVWbFpSVlZSbmVFMHdlRXRMTW1oUVZGVnJOV0pzYkZoYVZrNXVUbFZrZGxkR2IzaFNibkJwVVROd2FsZEZTa1JUTURGNFdsZFdWMVpGTVVaVFJYYzFUa2hvTmxWdFZrMWxSMjh6Wkc1S1RWa3llRmhUYWtJelRIbDBjRTB6WXpWU1ZVNHpVRlF3YVV4RFNsRmtWMHB6WVZkT1RGcFlhMmxQYVVwT1V6SlNXV1ZGY0RSU1ZtUlJWV3RzTTFSc1FUTlZNMVl5VlVSQ1Mwd3dNSFpVYkZreFRWWmFZV1J1UmtSbFZUaHlUakpXUldRd2J6UlFVMG81Wmxnd1BTSXNJblI1Y0dVaU9pSnBjbTFoSW4wLnREQ2tEd1FBOW1lX1NUc0hNaXMzOTM0bmc0ZnZEcXI3d3dfdVdNY0ZVVTAwaUd6QkwwUl9qQUQwZ0R6UHhkTjVnN21OQkdORnZKdUZjMHlYckZncVZiX082MkJCSXk2UzVmR0lWeVNJRUVqbG9GQVNxdWJobXlieFBpVHhQREZicTUzdU0yam9Bb2w5U1laNkplbnhCRlY3emkxSGRGZXJmX0ZGa1VUNHVodmVpZl84WkJBQWxwcF9mY1dWNnlid1NGbUdsdGxOWGZVZ3MzZ2g0ZXNiOXdoZ3NnUG9nMGljSFRNYTJqZGxTZG1uVnVqVGx0a1FheFhUZ0xzVVFpUGRyWTRMZEhod29xcnVYZlRISHhRQU02dFJNM29vMV9Mb2hucVN5akkzLU9CYmt0UDYxNXRPYkhmZGEtQ0pMbmNnZTRDYWxULThqRnFpSDUtUXYzOVptQSJ9.gA373m5JjbVfpjI4rn780G_OK2dakg6OZxTn2UxgXWgPQH0nop4sX-mIT5o7IhKFW4T1GfpuwrVfufvHriNRXZsG8JHY5tJlbX5gVeUY9QCFj2pocGVqHT5ZXuaLPtCb41l0ZOUESO7C6DFc4R4i7nZfTp_Grde9P4OIcZzAR523f7Z0-JkYSWcFgklkX8WHaNndbaFzSkG3Tu84jBaGl9qxyTBh5mgntiWlAfRxmp09U9Hhnr3Dl1ly-nAPRmr2SjOIEbr736L9p9khKsLPZW5kllTeugzOwyZDHzpcvhlcQN_7_XpF2E1yteVMkq91210GkekMRfAzbf9BXTGLaw'
+
+       {
+          "access_token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc3ZhbmRlcnZlZ3QubmwiLCJleHAiOjE1ODI2Mjg3ODMsImZhbWlseV9uYW1lIjoiQnJ1aWpuIiwiZ2l2ZW5fbmFtZSI6IldpbGxla2UiLCJpYXQiOjE1ODI2Mjc4ODMsImlzcyI6InVybjpvaWQ6Mi4xNi44NDAuMS4xMTM4ODMuMi40LjYuMTowMDAwMDAwMSIsIm5hbWUiOiJXaWxsZWtlIGRlIEJydWlqbiIsInByZWZpeCI6ImRlIiwic2NvcGUiOiJudXRzLXNzbyIsInNpZCI6InVybjpvaWQ6Mi4xNi44NDAuMS4xMTM4ODMuMi40LjYuMzo5OTk5OTk5OTAiLCJzdWIiOiJ1cm46b2lkOjIuMTYuODQwLjEuMTEzODgzLjIuNC42LjE6MDAwMDAwMDAifQ.Ijux1Y0ASChDNuxPd7yXoaNwnaqnkJt9JYGAkOAAYyivEQW55H1GAlHsqIHy7h-VAIKB9qJLo_Dumgpwu-oi_-ETjlO64Id-FDieUzSUgRAwlx3m0n1cym7072BRAoRnhFtP-ncYyxx-vI-cd7UtPxVIA9adhma2768NnGAvnrSKP2Q5xao9GuBjjD3kD8XFpTX8MN-u695HKH8fYTNZ2Hdtry14sTbaDnJu9CTT_lZDp_9Y9u9nwmjfjgLb_pla2Q2LUFaFasFRerX6s32XulXt0WuLZt-XXFLDlc5u18UwI3koXM61-VnFJ1nUsb2lq00nJyIUXi3pdR20mO1zsA",
+          "expires_in": 0,
+          "token_type": ""
+       }
+
+#. The client application redirects the user to the jump url with the access token in the URL
+
+   .. code-block:: http
+
+      HTTP/1.1 302 Found
+      Location: http://sso.nootenboom.local?access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+#. The resource server retrieves all information from the access token by performing token introspection
+
+   #. Retrieve the information from the access token: `rfc7662 <https://tools.ietf.org/html/rfc7662>`_
+
+      If the field active is equal to `true` then the access token is valid and the resource server can proceed.
+
+      .. code-block:: console
+
+        $ curl --location --request POST 'custodians.nuts-node.local/auth/token_introspection' \
+          --header 'Content-Type: application/x-www-form-urlencoded' \
+          --data-urlencode 'token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1haWxAc3Zh...46b2lkOjIuMTYuODQwLjEuMTEzODgzLjIuNC42LjE6MDAwMDAwMDAifQ.rtBqB5kuWXyIA_MimIyBS9OSREyf4lRb00xm8v7qPG1TYkI_PXj4p_Tz2Cp4a1vwPfQag5z77eqxcjqcOUQx9Xdm44nw8seQ-GqYLrf8czkSCGTNg7MuwmjuvSD2GCPfMqzYvLOo8PPBzmwthZNmBKUGuNB9Cst_y6y6ShVbl3tyL9ZBabpAJwptXVg5oZBG8ANObCiruR4uf3hvm_Ci3upR4xKf6U2yj55eASVEGicIdLQu-zVhKmU-1G8xLjIxD6iVqpAwH5rmcbI8nt0B-9h33rbB59xW3NY4WCJ7YvplgTlOUUUP3jE2NhMmZT_Yxq00DqRweS9pr5wAdo4k6w'
+
+          {
+              "active": true,
+              "aud": "",
+              "exp": 1582628499,
+              "iat": 1582627599,
+              "iss": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
+              "name": "Willeke de Bruijn",
+              "family_name": "Bruijn",
+              "prefix": "de",
+              "given_name": "Willeke",
+              "email": "w.debruijn@example.org",
+              "scope": "nuts-sso",
+              "sid": "urn:oid:2.16.840.1.113883.2.4.6.3:999999990",
+              "sub": "urn:oid:2.16.840.1.113883.2.4.6.1:00000000"
+          }
+
+#. The resource server serves the requested page to the user respecting the
+  context from the access token.
+
+
+Endpoints
+=========
+
+The sso registry endpoint should use the following `endpointType`
+::
+
+  urn:oid:1.3.6.1.4.1.54851.1:nuts-sso
+
+The properties object of the endpoint should contain the `authorizationServerURL`.
+This is the location of the OAuth 2.0 authorization server of this endpoint.
+A complete registry entry can look like this:
+
+::
+
+    {
+        "URL": "http://localhost:80",
+        "endpointType": "urn:oid:1.3.6.1.4.1.54851.1:nuts-sso",
+        "identifier": "7b8f7852-d218-4242-8406-39cf6abcde58",
+        "properties": {
+            "authorizationServerURL": "http://bundy-nuts-service-space:1323"
+        },
+        "status": "active"
+    }
+
+Setup a development network
+***************************
+
+
+This is all tested on MacOS and Ubuntu 19. On Windows 10 you can use the Linux bash shell. Let us now if you run into problems.
+
+To run on Linux (Ubuntu) you'll need the following prerequisites:
+
+- "jq" package: ``$ sudo apt-get install jq``
+- Rootless Docker daemon (otherwise the shell scripts will create files under *root* user rather than your own): https://docs.docker.com/engine/security/rootless/
+
+Background
+==========
+
+We will start up 2 nuts nodes with 3 care organizations.
+We will register a consent for patient Luuk from the general practitioner (Huisartsenpraktijk Nootenboom)
+to the long term care organization (Verpleeghuis De Nootjes).
+Now, people from Verpleeghuis De Nootjes can SSO to the EHR of the general practitioner.
+
+What you'll need
+================
+
+The irma app installed on your phone
+https://irma.app/
+
+Several IRMA (demo) credentials loaded in the IRMA App
+
+From the demo municipality: first name, last name full name, initials, prefix
+https://privacybydesign.foundation/attribute-index/en/irma-demo.gemeente.personalData.html
+
+An real email attribute
+https://privacybydesign.foundation/uitgifte/email/
+
+A (free) ngrok account to allow incoming request from the IRMA app to your local machine
+https://ngrok.com
+
+A fairly recent docker and docker-compse version
+(Make sure your docker has enough memory > 7gb)
+
+Getting started
+===============
+
+Follow the steps as provided in the :ref:`nuts-setup-local-network` guide
+
+Setup the consent:
+
+* Navigate to the EHR of Huisartsenpraktijk Nootenboom
+  Open http://localhost:8001
+* Login with irma (if you're not redirected after login, manually navigate to '/')
+* Navigate to patient Luuk
+* Add consent for organisation Verpleeghuis De Nootjes by opening the *Network* tab and adding a share.
+  After adding the share, wait until the state 'pending acceptance' disappears.
+  Now, Verpleeghuis De Nootjes may access the medical information.
+* Logout
+
+Make a SSO jump
+
+* Open http://localhost:8000 (EHR of Verpleeghuis De Nootjes)
+* Login with irma (if you're not redirected after login, manually navigate to '/')
+* Navigate to Luuk
+* Open the Network tab
+* Click on the SSO link
+* Verify you are back in the EHR of Huisartsenpraktijk Nootenboom in the context of patient Luuk
+
+.. note::
+
+  Since the consent now has been registered, next time you can start up the network
+  without Corda nodes by running ./start-network.sh ehr
+
+
+
+TODO
+****
+
+The access token should be opaque to the client application. In a stateless token (the current implementation of the Nuts node) the token is a JWT containing the BSN of the subject. The token should be encrypted. This is currently not the case. This is fine for DEMO purposes, but should be fixed for production. Since the token is used in a GET request, it can be recorded by the browser and the server logs.
