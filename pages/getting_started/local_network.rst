@@ -1,11 +1,5 @@
 Setup a local Nuts network
 --------------------------
-
-.. warning::
-
-  This instruction is only tested with the corresponding tagged/versioned branches and containers.
-  Master branch or any other specific use-case related versions might need their own set of instructions.
-
 Since Nuts is a distributed network, every party in the network runs its own node. A node consist of 3 parts:
 
 * The `nuts-go <https://github.com/nuts-foundation/nuts-go>`_ application which behaves as the main access point for vendors
@@ -135,15 +129,32 @@ The script will ask for a ngrok token during first boot. For this you will need 
 
   It may take some time (up to ~4 minutes) for all nodes to be booted up. If you see errors about ``Cannot connect to server(s)`` just wait a little longer
 
-
 .. code-block:: console
 
-  $ start-network.sh
+  $ ./start-network.sh
 
 Congratulations!! You just booted a full Nuts network on your local machine :)
 
-Record your first consent
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Demo EHR
+^^^^^^^^
+
+To make interacting with Nuts a bit more fun we added a Demo EHR. There are 3 care organizations available on the addresses:
+
++---------------------------------+------------------------------+--------------------------+
+| Care provider name              | Address                      | Corda Node               |
++=================================+==============================+==========================+
+| Verpleeghuis de Nootjes         | http://localhost:8000        | Bundy                    |
++---------------------------------+------------------------------+--------------------------+
+| Huisartsenpraktijk Nootenboom   | http://localhost:8001        | Dahmer                   |
++---------------------------------+------------------------------+--------------------------+
+| Medisch Centrum Noot aan de Man | http://localhost:8002        | Dahmer                   |
++---------------------------------+------------------------------+--------------------------+
+
+To register a consent, choose a patient who is know by both organizations. Luuk Meijer is such a patient who is known to Verpleeghuis de Nootjes and known to Huisartsenpraktijk Nootenboom.
+Go to the patient, click in the network tab and Add a consent. This should take less than a minute. You can see the progress by going to the patients list and scroll down tot the Transactions section.
+
+Record your first consent using the API
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To see if everything is set up correctly, we will create a consent request by posting to the consent-logic api.
 More details about the api and its endpoints can be found :ref:`here<Nuts consent logic API>`
