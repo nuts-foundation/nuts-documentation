@@ -233,7 +233,7 @@ def download_repo(repo, branch):
 def download_module(module, branch):
     output = download_repo(module, branch)
     print("Output: {}".format(str(output)))
-    if str.find(str(output), 'tar: Unrecognized archive format') != -1 | str.find(str(output), 'Error') != -1:
+    if str.find(str(output), 'tar: Unrecognized archive format') != -1 or str.find(str(output), 'Error') != -1:
         print("branch {} not found for {}, switching to master".format(branch, module))
         download_repo(module, 'master')
 
