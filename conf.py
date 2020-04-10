@@ -15,6 +15,7 @@
 import os
 import sys
 import subprocess
+import re
 import io
 
 sys.path.insert(0, os.path.abspath('.'))
@@ -224,18 +225,38 @@ def download_repo(repo, branch):
     url = "https://codeload.github.com/nuts-foundation/{}/tar.gz/{}".format(repo, branch)
     print("Downloading {}".format(url))
 
+    v = branch
+    if v.startswith("v"):
+        v = v[1:]
+
     ps_process = subprocess.Popen(['curl', url], stdout=subprocess.PIPE)
-    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, branch), "{}-{}/docs/_static".format(repo, branch)], stdin=ps_process.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    grep_process = subprocess.Popen(["tar", "-xz", "--strip=2", "{}-{}/docs/pages".format(repo, v), "{}-{}/docs/_static".format(repo, v)], stdin=ps_process.stdout, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     ps_process.stdout.close()
 
     return grep_process.communicate()[1]
 
+# this will try to find the highest patch version for the given version, master otherwise
 def download_module(module, branch):
-    output = download_repo(module, branch)
-    print("Output: {}".format(str(output)))
-    if str.find(str(output), 'tar: Unrecognized archive format') != -1 or str.find(str(output), 'Error') != -1:
-        print("branch {} not found for {}, switching to master".format(branch, module))
-        download_repo(module, 'master')
+    # search order
+    a = ["master"]
+
+    tags = re.search(r'[v]?([0-9]+)\.([0-9]+)\.([0-9]+)', branch, re.M | re.I)
+    if tags:
+        major = tags.group(1)
+        minor = tags.group(2)
+        patch = tags.group(3)
+        i = 0
+        while i <= int(patch):
+            v = "v{}.{}.{}".format(major, minor, i)
+            a.insert(0, v)
+            i += 1
+
+    # loop
+    output = "Unrecognized archive format"
+    while str.find(str(output), 'Unrecognized archive format') != -1 and len(a) > 0:
+        c = a.pop(0)
+        output = download_repo(module, c)
+        print("Output: {}".format(str(output)))
 
 def config_init_handler(app, config):
     branch = rtd_version
@@ -245,6 +266,8 @@ def config_init_handler(app, config):
 
     if rtd_version == "stable":
         branch = latest_tag()
+
+    print("using {} as base version".format(branch))
 
     for m in modules:
         download_module(m, branch)
