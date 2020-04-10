@@ -253,7 +253,7 @@ def download_module(module, branch):
 
     # loop
     output = "Unrecognized archive format"
-    while str.find(str(output), 'Unrecognized archive format') != -1 and len(a) > 0:
+    while (str.find(str(output), 'Unrecognized archive format') != -1 or str.find(str(output), 'not in gzip format') != -1) and len(a) > 0:
         c = a.pop(0)
         output = download_repo(module, c)
         print("Output: {}".format(str(output)))
