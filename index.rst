@@ -29,9 +29,10 @@ Nuts documentation
     :caption: Node & Network:
     :glob:
 
+    pages/network/index.rst
     pages/installation/index.rst
-    pages/administration/index.rst
     pages/configuration/index.rst
+    pages/administration/index.rst
     pages/monitoring/index.rst
     pages/migration/index.rst
 
