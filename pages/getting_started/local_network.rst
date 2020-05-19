@@ -38,7 +38,7 @@ At the time of writing v0.13.0 is the latest version. Make sure to use a stable 
    Receiving objects: 100% (129/129), 286.29 KiB | 1.04 MiB/s, done.
    Resolving deltas: 100% (62/62), done.
    cd nuts-network-local
-   $ git checkout tags/0.13.0
+   $ git checkout 0.13
 
 Inspect the package
 ^^^^^^^^^^^^^^^^^^^
