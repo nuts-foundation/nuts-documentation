@@ -168,8 +168,8 @@ More details about the api and its endpoints can be found :ref:`here<Nuts consen
   -H 'Content-Type: application/json' \
   -d '{
     "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:99999990",
-    "custodian": "urn:oid:2.16.840.1.113883.2.4.6.1:00000000",
-    "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
+    "custodian": "urn:oid:2.16.840.1.113883.2.4.6.1:12345678",
+    "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:87654321",
     "performer": "urn:oid:2.16.840.1.113883.2.4.6.1:00000007",
     "records": [{
       "consentProof": {
@@ -207,8 +207,8 @@ To check consents for the combination of actor and subjec you can perform the fo
   http://localhost:11323/consent/query \
   -H 'Content-Type: application/json' \
   -d '{
-  "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:00000001",
-  "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:999999990"
+  "actor": "urn:oid:2.16.840.1.113883.2.4.6.1:87654321",
+  "subject": "urn:oid:2.16.840.1.113883.2.4.6.3:99999990"
   }'
 
 There are quite a few steps to perform by the two nuts nodes before the consent is recorded. Check out the :ref:`state machine with all the events here<Service space event specification>`.
