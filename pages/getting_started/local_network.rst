@@ -62,6 +62,10 @@ You are encouraged to inspect these files.
 Generate the corda nodes
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. note::
+
+  Windows users may want to execyte this using git-bash.
+
 To create a network of trust, Corda uses a bootstrapper tool. This tool must be downloaded
 because it's to large to keep in version control. For more information about the bootstrapping process see the corda docs: https://docs.corda.net/docs/corda-os/4.4/network-bootstrapper.html
 We provided a script to download and run the tool.
