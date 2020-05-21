@@ -1,5 +1,5 @@
 @startuml
-== Connecting: authentication and peer identification ==
+== Connecting ==
 participant "Node A" as A
 participant "Node B" as B
 A -> B : TLS handshake\n(self-issued vendor TLS certificate)
@@ -27,21 +27,32 @@ A -> A : Add to peerlist
 
 == Discovery ==
 B -> A : AdvertPeerList(peerlist)
+note right
+    Peerlist advertisement to newly connected peers
+    can happen concurrently; there's no defined order
+    (first node A then B or vice versa).
+end note
 A --> B
-A -> A : Connect to new peers
+loop for each in peerlist
+    A -> A : Connect to new peer
+end
 note right
    TODO: Should node B broadcast node A's
    peerInfo to its other peers?
 end note
 A -> B : AdvertPeerList(peerlist)
 B --> A
-B -> B : Connect to new peers
+loop for each in peerlist
+    B -> B : Connect to new peer
+end
 
-== Broadcast ==
-A -> B : Broadcast(channel, message)
-note right
-   we broadcast the message to all of our peers. Since we
-   have a full mesh network relaying the message is not necessary.
-   Broadcasts at-most-once (no guaranteed delivery).
-end note
+== Broadcasting ==
+loop for each peer
+    A -> B : Broadcast(channel, hash)
+    note right
+       we broadcast the message to all of our peers. Since we
+       have a full mesh network relaying the message is not necessary.
+       Broadcasts at-most-once (no guaranteed delivery).
+    end note
+end
 @enduml
