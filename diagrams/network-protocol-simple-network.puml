@@ -1,0 +1,19 @@
+@startdot
+digraph peergraph1 {
+    layout=twopi
+    root=B
+    ranksep=3 #distance between nodes
+    node [style=round]
+    A [shape=circle, label="node A"]
+    B [shape=circle, label="node B\n(bootstrap)"]
+    C [shape=circle, label="node C"]
+    D [shape=circle, label="node D"]
+
+    C -> B
+    D -> B
+    C -> D
+    A -> B [style=dashed, label=1]
+    A -> C [style=dotted, label=2]
+    A -> D [style=dotted, label=2]
+}
+@enddot
