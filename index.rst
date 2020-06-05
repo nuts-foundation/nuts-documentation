@@ -34,6 +34,7 @@ Nuts documentation
     pages/configuration/index.rst
     pages/administration/index.rst
     pages/monitoring/index.rst
+    pages/production/index.rst
     pages/migration/index.rst
 
 .. toctree::
