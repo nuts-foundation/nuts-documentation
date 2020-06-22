@@ -6,6 +6,65 @@ Release notes
 Whats has been changed, and how to update between versions.
 
 *******
+v0.14.0
+*******
+
+This release added additional information to the Corda states. This allows vendor software to diagnose any problems and have a better understanding what the current state of a consent request is.
+
+For specific issues also see: https://github.com/orgs/nuts-foundation/projects/12
+
+======================
+Upgrading from v0.13.0
+======================
+
+Starting version 0.14 vendors and organizations will have an X.509 certificate (encoded in the JWK) associated with their key pairs. These certificates are used to identify the holder of the key pair used to sign events, which is also introduced in this version.
+
+Action required: This migration can be performed by the Nuts node; use the newly introduced `registry verify` command with the `–fix` flag to generate key pairs (if necessary), issue certificates and sign events. **Don’t forget to publish these changes to the central registry.**
+See :ref:`5. Verifying and fixing registry data` for the command.
+
+See :ref:`migration` for a complete overview of all migrations.
+
+=======================
+Features / improvements
+=======================
+
+- Support update events in registry. (https://github.com/nuts-foundation/nuts-registry/issues/41)
+- Remove vendor Id from vendor CLI commands. (https://github.com/nuts-foundation/nuts-registry/issues/47)
+- Auto generate vendor and organisation certificates. (https://github.com/nuts-foundation/nuts-registry/pull/94)
+- Make HTTP client time-out configurable. (https://github.com/nuts-foundation/nuts-registry/issues/101)
+- Add cancel flow for ConsentRequestState. (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/16)
+- Support cancellation event (https://github.com/nuts-foundation/nuts-consent-bridge/issues/7)
+- Fixed readEvent() to not break Ref() calclations. (https://github.com/nuts-foundation/nuts-registry/issues/100)
+- Register initiating node and legalEntity in branch. (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/47)
+- Allow administrators to reissue vendor and organization certificates (https://github.com/nuts-foundation/nuts-registry/issues/97)
+- Remove legacy_auth_token (https://github.com/nuts-foundation/nuts-auth/issues/53)
+- publish errors to normal channel to initiate cancellation. (https://github.com/nuts-foundation/nuts-consent-logic/issues/63)
+- Add extra origin information for a consentRequest (https://github.com/nuts-foundation/nuts-consent-logic/pulls/62)
+- Removed decodeURI, not needed for latest echo and updated all modules (https://github.com/nuts-foundation/nuts-go/pulls/43)
+- Update event diagram with 'closed' event (https://github.com/nuts-foundation/nuts-event-octopus/pulls/35)
+
+========
+Bugfixes
+========
+
+All bugs were fixed in 0.13.x versions.
+
+- Missing endpoint does not result in errored event or retry. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/61)
+- Already uploaded attachment gave error. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/52)
+- Incorrect starting point of Nats subscription. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/56)
+- Corda connection monitoring not working properly (https://github.com/nuts-foundation/nuts-consent-bridge/issues/54)
+- Not enough memory allocated for Corda in Docker image. (https://github.com/nuts-foundation/nuts-consent-cordapp/issues/42)
+- Endpoint deduplication in API removing too much endpoints. (https://github.com/nuts-foundation/nuts-registry/issues/90)
+- Contract validation incomplete. (https://github.com/nuts-foundation/nuts-auth/issues/56)
+- Retry event doesn't increment retryCount. (https://github.com/nuts-foundation/nuts-consent-bridge/issues/53)
+- DemoEHR endpoints have the wrong port (https://github.com/nuts-foundation/nuts-network-local/issues/11)
+- Fix sphinx python script to allow for semantic versioning (https://github.com/nuts-foundation/nuts-documentation/issues43)
+- Diagnostics shows Nats DOWN state (https://github.com/nuts-foundation/nuts-consent-bridge/issues/63)
+- Diagnostics shows Corda DOWN state (https://github.com/nuts-foundation/nuts-consent-bridge/issues/64)
+- Records can't be recorded twice: dup record/unique constraint (https://github.com/nuts-foundation/nuts-consent-store/issues/55)
+- Registering vendor doesn't survive restarts: (https://github.com/nuts-foundation/nuts-registry/issues/103)
+
+*******
 v0.13.0
 *******
 
