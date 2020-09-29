@@ -12,6 +12,33 @@ Migration
 This chapter describes which migrations are performed when upgrading your Nuts node. Most of them will be automatic, but sometimes
 manual action is required.
 
+0.15
+^^^^
+Starting 0.15 the node will default to vendor CA certificates issued by the Nuts Network Authority instead of self-signing
+them. See :ref:`register-vendor-label` how to register (or update) your vendor. There is backwards compatibility by supporting
+self-signed certificates issued before version 0.15.
+
+In 0.15 the Nuts Network is introduced, an experimental P2P network decentralized document transport layer which is
+intended as a replacement candidate for Nuts Registry data on Github and Consents over Corda.
+
+**Manual action required**
+
+While the Nuts Network engine is enabled by default it needs configuration to function optimally:
+
+1. Configure bootstrap node(s) using which peer nodes can be discovered; since there's no dedicated bootstrap node
+   (at time of writing) it has to be configured with the Nuts Network address of one (or more) of the node's peer vendor nodes.
+   This is done using the `NUTS_NETWORK_BOOTSTRAPNODES` which takes a space-separated list of nodes
+   (e.g. `vendor-b:5555 vendor-c:9876`) to initially connect to.
+2. Configure `NUTS_NETWORK_GRPCADDR` which is the local interface address gRPC (which powers Nuts Network) will bind on.
+   Defaults to `:5555` but should be changed if applicable. This interface should be publicly reachable (but can be behind
+   a TLS forwarding proxy). TLS termination for incoming connections using a proxy in front of the node is currently not possible.
+3. Configure `NUTS_NETWORK_PUBLICADDR` which is the network address (`host:port`) which will be advertised on the network
+   so that your node can be discovered by other nodes you're not directly connected to. This will typically be used to
+   support resolving by public DNS entries (e.g. `nuts.vendor-A.nl:5555`), when the Nuts node is behind a proxy/load balancer
+   or NAT.
+
+Refer to :ref:`nuts-network-configuration` for configuration guidelines for your particular infrastructure layout.
+
 0.14
 ^^^^
 Starting version 0.14 vendors and organizations will have an X.509 certificate (encoded in the JWK) associated with their key pairs.
