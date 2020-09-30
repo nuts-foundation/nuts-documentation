@@ -6,6 +6,34 @@ Release notes
 Whats has been changed, and how to update between versions.
 
 *******
+v0.15.0
+*******
+
+This release adds the p2p registry. Github is still used as backup registry but registry updates should now be instant!
+
+Project board: https://github.com/orgs/nuts-foundation/projects/9
+Required migrations: :ref:`migration`
+
+=======================
+Features / improvements
+=======================
+
+- Add Nuts network, a p2p network using grpc. (https://github.com/nuts-foundation/nuts-registry/pulls/119)
+- Process events received through Nuts network. (https://github.com/nuts-foundation/nuts-registry/issues/141)
+- GenerateKeyPair should only overwrite existing key pair if specified. (https://github.com/nuts-foundation/nuts-crypto/issues/83)
+- Added support for Prometheus format diagnostics.
+- Added client interface for remote crypto administration. (https://github.com/nuts-foundation/nuts-crypto/issues/18)
+- Add baseline truststore. (https://github.com/nuts-foundation/nuts-crypto/issues/61)
+- Add certificate expiration monitoring. (https://github.com/nuts-foundation/nuts-crypto/issues/65)
+
+========
+Bugfixes
+========
+
+- Vendor ID was parsed incorrectly from <0.15 certificates. (https://github.com/nuts-foundation/nuts-registry/issues/142)
+- Irma scheme didn't update for validator. (https://github.com/nuts-foundation/nuts-auth/pulls/92)
+
+*******
 v0.14.0
 *******
 
