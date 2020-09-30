@@ -18,7 +18,7 @@ Required migrations: :ref:`migration`
 Features / improvements
 =======================
 
-- Add Nuts network, a p2p network using grpc. (https://github.com/nuts-foundation/nuts-registry/pulls/119)
+- Add Nuts network, a p2p network using grpc. (https://github.com/nuts-foundation/nuts-registry/pull/119)
 - Process events received through Nuts network. (https://github.com/nuts-foundation/nuts-registry/issues/141)
 - GenerateKeyPair should only overwrite existing key pair if specified. (https://github.com/nuts-foundation/nuts-crypto/issues/83)
 - Added support for Prometheus format diagnostics.
@@ -31,7 +31,7 @@ Bugfixes
 ========
 
 - Vendor ID was parsed incorrectly from <0.15 certificates. (https://github.com/nuts-foundation/nuts-registry/issues/142)
-- Irma scheme didn't update for validator. (https://github.com/nuts-foundation/nuts-auth/pulls/92)
+- Irma scheme didn't update for validator. (https://github.com/nuts-foundation/nuts-auth/pull/92)
 
 *******
 v0.14.0
@@ -67,9 +67,9 @@ Features / improvements
 - Allow administrators to reissue vendor and organization certificates (https://github.com/nuts-foundation/nuts-registry/issues/97)
 - Remove legacy_auth_token (https://github.com/nuts-foundation/nuts-auth/issues/53)
 - publish errors to normal channel to initiate cancellation. (https://github.com/nuts-foundation/nuts-consent-logic/issues/63)
-- Add extra origin information for a consentRequest (https://github.com/nuts-foundation/nuts-consent-logic/pulls/62)
-- Removed decodeURI, not needed for latest echo and updated all modules (https://github.com/nuts-foundation/nuts-go/pulls/43)
-- Update event diagram with 'closed' event (https://github.com/nuts-foundation/nuts-event-octopus/pulls/35)
+- Add extra origin information for a consentRequest (https://github.com/nuts-foundation/nuts-consent-logic/pull/62)
+- Removed decodeURI, not needed for latest echo and updated all modules (https://github.com/nuts-foundation/nuts-go/pull/43)
+- Update event diagram with 'closed' event (https://github.com/nuts-foundation/nuts-event-octopus/pull/35)
 
 ========
 Bugfixes
