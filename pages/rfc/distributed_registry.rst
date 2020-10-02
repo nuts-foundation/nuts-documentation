@@ -3,6 +3,10 @@
 RFC: Distributed Registry
 #########################
 
+.. note::
+
+    This document is going to be replaced by Nuts Specification RFC003, RFC004 and RFC005.
+
 The goal of this system is to provide a registry in which parties can:
 
 * Lookup endpoints which can be used to exchange data.
