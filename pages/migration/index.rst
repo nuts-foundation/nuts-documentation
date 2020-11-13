@@ -39,6 +39,10 @@ While the Nuts Network engine is enabled by default it needs configuration to fu
 
 Refer to :ref:`nuts-network-configuration` for configuration guidelines for your particular infrastructure layout.
 
+Notes for v0.15.2: fixes a bug that causes old registry events that are received through the new experimental Nuts network
+to have a zeroed timestamp. It removes invalid documents (zeroed timestamp) from the local storage and disallows adding
+new documents with a zeroed timestamp.
+
 0.14
 ^^^^
 Starting version 0.14 vendors and organizations will have an X.509 certificate (encoded in the JWK) associated with their key pairs.
