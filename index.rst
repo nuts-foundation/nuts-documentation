@@ -11,7 +11,6 @@ Nuts documentation
 
     pages/architecture/index.rst
     pages/technical/index.rst
-    pages/rfc/index.rst
 
 .. toctree::
     :maxdepth: 1
