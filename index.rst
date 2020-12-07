@@ -18,6 +18,7 @@ Nuts documentation
     :glob:
 
     pages/getting_started/index.rst
+    pages/implementation/index.rst
     pages/development/index.rst
     pages/API/index.rst
     pages/contribute.rst
