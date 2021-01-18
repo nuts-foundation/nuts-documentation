@@ -3,7 +3,13 @@
 Release notes
 #############
 
-Whats has been changed, and how to update between versions.
+*******
+v0.16.0
+*******
+
+This release implements the oauth flow according to rfc006. This will be the last release as a 0.x.y minor version. It'll not be used in production and marks the end of the implementation that uses Corda for consent exchange and github as registry.
+
+Implementation has started on a registry based on Distributed Identifiers and Verifiable Credentials. The legal base for data exchange is to be based on verifiable credentials that will be exchanged in a peer-to-peer fashion.
 
 *******
 v0.15.0
