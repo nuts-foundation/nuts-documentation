@@ -3,6 +3,9 @@ Nuts Documentation
 
 This project contains the public documentation for Nuts.
 
+> :warning: **DEPRECATED** This documentation is for the first Nuts node with the Corda softare. The new version can be found here: https://github.com/nuts-foundation/nuts-node/. 
+
+
 To generate the documentation locally follow the following steps:
 
 .. inclusion-marker-for-contribution
